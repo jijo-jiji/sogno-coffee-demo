@@ -1,0 +1,300 @@
+[
+  {
+    "model": "menu.category",
+    "pk": 1,
+    "fields": {
+      "name": "Pastry Sogno",
+      "slug": "pastry-sogno",
+      "display_order": 1,
+      "is_active": true
+    }
+  },
+  {
+    "model": "menu.category",
+    "pk": 2,
+    "fields": {
+      "name": "Coffee",
+      "slug": "coffee",
+      "display_order": 2,
+      "is_active": true
+    }
+  },
+  {
+    "model": "menu.category",
+    "pk": 3,
+    "fields": {
+      "name": "Frappe",
+      "slug": "frappe",
+      "display_order": 3,
+      "is_active": true
+    }
+  },
+  {
+    "model": "menu.category",
+    "pk": 4,
+    "fields": {
+      "name": "Milk Series",
+      "slug": "milk-series",
+      "display_order": 4,
+      "is_active": true
+    }
+  },
+  {
+    "model": "menu.outlet",
+    "pk": 1,
+    "fields": {
+      "name": "Kota Bharu Flagship (HQ)",
+      "city": "Kota Bharu",
+      "address": "PT 482, Jalan Lembah Sireh, 15050 Kota Bharu, Kelantan",
+      "phone": "+60 9-743 2889",
+      "operating_hours": "8:00 AM - 11:30 PM",
+      "is_active": true
+    }
+  },
+  {
+    "model": "menu.outlet",
+    "pk": 2,
+    "fields": {
+      "name": "Pantai Tapang, Bachok",
+      "city": "Bachok",
+      "address": "Pantai Tapang, 16300 Bachok, Kelantan",
+      "phone": "+60 19-980 4455",
+      "operating_hours": "9:00 AM - 11:00 PM",
+      "is_active": true
+    }
+  },
+  {
+    "model": "menu.outlet",
+    "pk": 3,
+    "fields": {
+      "name": "Shah Alam Seksyen 7",
+      "city": "Shah Alam",
+      "address": "No. 14, Jalan Plumbum Q7/Q, Seksyen 7, 40000 Shah Alam, Selangor",
+      "phone": "+60 3-5524 8192",
+      "operating_hours": "8:30 AM - 11:00 PM",
+      "is_active": true
+    }
+  },
+  {
+    "model": "menu.outlet",
+    "pk": 4,
+    "fields": {
+      "name": "Ampang Point",
+      "city": "Ampang",
+      "address": "Lot G-12, Ampang Point Shopping Centre, 68000 Ampang, Selangor",
+      "phone": "+60 3-4251 6720",
+      "operating_hours": "8:00 AM - 10:30 PM",
+      "is_active": true
+    }
+  },
+  {
+    "model": "menu.menuitem",
+    "pk": 1,
+    "fields": {
+      "name": "Red Velvet Croissant",
+      "category": 1,
+      "price": "21.00",
+      "description": "Croissant with cream cheese filling.",
+      "badge": "Signature Pastry",
+      "is_fresh_bake": true,
+      "is_available": true,
+      "created_at": "2026-09-13T12:00:00Z"
+    }
+  },
+  {
+    "model": "menu.menuitem",
+    "pk": 2,
+    "fields": {
+      "name": "Crofa",
+      "category": 1,
+      "price": "18.90",
+      "description": "Croissant with chocolate mix and strawberry topping.",
+      "badge": "Crowd Favorite",
+      "is_fresh_bake": true,
+      "is_available": true,
+      "created_at": "2026-09-13T12:00:00Z"
+    }
+  },
+  {
+    "model": "menu.menuitem",
+    "pk": 3,
+    "fields": {
+      "name": "Kunafa Pistachio",
+      "category": 1,
+      "price": "18.90",
+      "description": "Pistachio-infused kunafa pastry.",
+      "badge": "Viral Hit",
+      "is_fresh_bake": true,
+      "is_available": true,
+      "created_at": "2026-09-13T12:00:00Z"
+    }
+  },
+  {
+    "model": "menu.menuitem",
+    "pk": 4,
+    "fields": {
+      "name": "Pain Au Kitkat",
+      "category": 1,
+      "price": "17.00",
+      "description": "Pain Au Chocolat style pastry with KitKat flavors.",
+      "badge": "Chef's Pick",
+      "is_fresh_bake": true,
+      "is_available": true,
+      "created_at": "2026-09-13T12:00:00Z"
+    }
+  },
+  {
+    "model": "menu.menuitem",
+    "pk": 5,
+    "fields": {
+      "name": "Jumbo Croissant",
+      "category": 1,
+      "price": "40.00",
+      "description": "Signature 40cm massive butter croissant as showcased in the Sogno display chiller.",
+      "badge": "Chiller Star",
+      "is_fresh_bake": true,
+      "is_available": true,
+      "created_at": "2026-09-13T12:00:00Z"
+    }
+  },
+  {
+    "model": "menu.menuitem",
+    "pk": 6,
+    "fields": {
+      "name": "Buttercream Latte",
+      "category": 2,
+      "price": "19.10",
+      "description": "Rich espresso blended with creamy buttercream.",
+      "badge": "#1 Bestseller",
+      "is_fresh_bake": false,
+      "is_available": true,
+      "created_at": "2026-09-13T12:00:00Z"
+    }
+  },
+  {
+    "model": "menu.menuitem",
+    "pk": 7,
+    "fields": {
+      "name": "Spanish Latte",
+      "category": 2,
+      "price": "17.60",
+      "description": "Espresso-based beverage with milk and condensed milk.",
+      "badge": "Customer Favorite",
+      "is_fresh_bake": false,
+      "is_available": true,
+      "created_at": "2026-09-13T12:00:00Z"
+    }
+  },
+  {
+    "model": "menu.menuitem",
+    "pk": 8,
+    "fields": {
+      "name": "Sogno Americano",
+      "category": 2,
+      "price": "11.00",
+      "description": "Clean, aromatic double-shot extraction using signature Arabica beans.",
+      "badge": "Classic",
+      "is_fresh_bake": false,
+      "is_available": true,
+      "created_at": "2026-09-13T12:00:00Z"
+    }
+  },
+  {
+    "model": "menu.menuitem",
+    "pk": 9,
+    "fields": {
+      "name": "Caramel Macchiato",
+      "category": 2,
+      "price": "18.50",
+      "description": "Steamed vanilla-infused milk marked with bold espresso and caramel drizzle.",
+      "badge": "Sweet Tooth",
+      "is_fresh_bake": false,
+      "is_available": true,
+      "created_at": "2026-09-13T12:00:00Z"
+    }
+  },
+  {
+    "model": "menu.menuitem",
+    "pk": 10,
+    "fields": {
+      "name": "Biscoff Frappe",
+      "category": 3,
+      "price": "23.50",
+      "description": "Caramel-flavored drink blended with spiced biscuits.",
+      "badge": "Signature Frappe",
+      "is_fresh_bake": false,
+      "is_available": true,
+      "created_at": "2026-09-13T12:00:00Z"
+    }
+  },
+  {
+    "model": "menu.menuitem",
+    "pk": 11,
+    "fields": {
+      "name": "Matcha Cream Frappe",
+      "category": 3,
+      "price": "22.00",
+      "description": "Authentic Uji matcha blended with fresh milk, vanilla base, and whipped cream.",
+      "badge": "Japanese Craft",
+      "is_fresh_bake": false,
+      "is_available": true,
+      "created_at": "2026-09-13T12:00:00Z"
+    }
+  },
+  {
+    "model": "menu.menuitem",
+    "pk": 12,
+    "fields": {
+      "name": "Dark Chocolate Mocha Frappe",
+      "category": 3,
+      "price": "22.50",
+      "description": "Rich Belgian cocoa melted with espresso freeze, topped with chocolate curls.",
+      "badge": "Chocoholic",
+      "is_fresh_bake": false,
+      "is_available": true,
+      "created_at": "2026-09-13T12:00:00Z"
+    }
+  },
+  {
+    "model": "menu.menuitem",
+    "pk": 13,
+    "fields": {
+      "name": "Pink Lady Milk",
+      "category": 4,
+      "price": "19.10",
+      "description": "Milkshake blended with Pink Lady apples and cinnamon.",
+      "badge": "House Specialty",
+      "is_fresh_bake": false,
+      "is_available": true,
+      "created_at": "2026-09-13T12:00:00Z"
+    }
+  },
+  {
+    "model": "menu.menuitem",
+    "pk": 14,
+    "fields": {
+      "name": "Strawberry Dream Milk",
+      "category": 4,
+      "price": "18.00",
+      "description": "Fresh strawberry compote layered with velvety fresh milk.",
+      "badge": "Fresh Fruit",
+      "is_fresh_bake": false,
+      "is_available": true,
+      "created_at": "2026-09-13T12:00:00Z"
+    }
+  },
+  {
+    "model": "menu.menuitem",
+    "pk": 15,
+    "fields": {
+      "name": "Pistachio Cream Milk",
+      "category": 4,
+      "price": "19.50",
+      "description": "Silky smooth milk infused with real crushed roasted pistachios.",
+      "badge": "Nutty Treat",
+      "is_fresh_bake": false,
+      "is_available": true,
+      "created_at": "2026-09-13T12:00:00Z"
+    }
+  }
+]

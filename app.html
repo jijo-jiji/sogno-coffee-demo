@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Sogno Coffee | Mobile Ordering</title>
+  <meta name="theme-color" content="#4F0A15">
+  <link rel="icon" type="image/png" href="assets/images/logo.png">
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700;800&family=Playfair+Display:ital,wght@0,600;0,800;1,600&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
+  
+  <link rel="stylesheet" href="assets/css/style.css">
+  <style>
+    body {
+      background: var(--sogno-cream);
+      overflow-x: hidden;
+    }
+    .app-native-wrapper {
+      max-width: 480px;
+      margin: 0 auto;
+      min-height: 100vh;
+      background: var(--sogno-cream);
+      display: flex;
+      flex-direction: column;
+      position: relative;
+      box-shadow: 0 0 40px rgba(0,0,0,0.15);
+    }
+    .outlet-modal-card {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 14px 16px;
+      border: 1px solid var(--surface-border);
+      border-radius: var(--radius-md);
+      margin-bottom: 10px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .outlet-modal-card:hover, .outlet-modal-card.active {
+      border-color: var(--sogno-maroon);
+      background: var(--sogno-maroon-light);
+    }
+  </style>
+</head>
+<body>
+
+  <div class="app-native-wrapper">
+    <!-- ZUS-Style App Header -->
+    <header class="app-header-zus">
+      <div class="app-store-line">
+        <div class="app-store-pill" id="appStoreDropdownTrigger" title="Tap to switch branch">
+          <div class="store-pin-circle">📍</div>
+          <div class="store-name-col">
+            <h2 id="appSelectedStoreName">Kota Bharu Flagship ▾</h2>
+            <span id="appStoreTimeSub">Ready in 10-15 mins • Self-Pickup</span>
+          </div>
+        </div>
+        
+        <div class="pickup-delivery-toggle">
+          <button class="toggle-choice-btn active" id="appTogglePickup">Pickup</button>
+          <button class="toggle-choice-btn" id="appToggleDelivery">Delivery</button>
+        </div>
+      </div>
+
+      <!-- Search Bar -->
+      <div class="app-search-wrap">
+        <span class="search-glass-icon">🔍</span>
+        <input type="text" id="appSearchInput" placeholder="Search croissants, buttercream latte, frappe...">
+      </div>
+    </header>
+
+    <!-- Scrollable Body -->
+    <div class="app-scroll-body">
+      <!-- Sogno Club VIP Bar -->
+      <div class="sogno-vip-strip">
+        <div class="vip-left">
+          <div class="vip-icon-emblem">☕</div>
+          <div class="vip-text">
+            <h4>Sogno Club <span class="vip-tier-badge">Silver Tier</span></h4>
+            <p>6 / 10 Sips to Next Free Buttercream Latte</p>
+          </div>
+        </div>
+        <span class="vip-voucher-tag">20% OFF Active</span>
+      </div>
+
+      <!-- Promo Banner -->
+      <div class="app-promo-card">
+        <div class="app-promo-content">
+          <span class="app-promo-badge">Fresh Oven Batch</span>
+          <h3>Kunafa Pistachio Croissant</h3>
+          <p>Toasted kataifi shreds & Sicilian pistachio praline.</p>
+        </div>
+        <div class="app-promo-thumb">
+          <img src="assets/images/pastry_chiller.png" alt="Pastry thumbnail">
+        </div>
+      </div>
+
+      <!-- Sticky Category Nav Pills -->
+      <nav class="app-category-bar" id="appCategoryNavPills"></nav>
+
+      <!-- Products Container -->
+      <div id="appProductsContainer"></div>
+    </div>
+
+    <!-- Floating Cart Pill -->
+    <div class="app-floating-cart-pill" id="appFloatingCart" style="display: none;">
+      <div class="cart-left-block">
+        <div class="cart-counter-bubble" id="appCartCount">0</div>
+        <div class="cart-pricing-col">
+          <strong id="appCartTotal">RM 0.00</strong>
+          <span id="appCartOrderTypeLabel">Self-Pickup</span>
+        </div>
+      </div>
+      <div class="cart-right-block">
+        <span>View Bag</span>
+        <span>→</span>
+      </div>
+    </div>
+
+    <!-- MODAL: Outlet Selector Bottom Sheet -->
+    <div class="app-sheet-backdrop" id="appOutletModal">
+      <div class="app-sheet-window">
+        <div class="sheet-drag-bar"></div>
+        <div class="sheet-top-header">
+          <div>
+            <h3>Select Sogno Outlet</h3>
+            <p>Choose the nearest kitchen for live prep</p>
+          </div>
+          <button class="sheet-close-x close-sheet-btn">✕</button>
+        </div>
+        <div class="sheet-scroll-body" id="appOutletListOptions"></div>
+      </div>
+    </div>
+
+    <!-- MODAL: Customization Bottom Sheet -->
+    <div class="app-sheet-backdrop" id="appCustomModal">
+      <div class="app-sheet-window">
+        <div class="sheet-drag-bar"></div>
+        <div class="sheet-top-header">
+          <div>
+            <h3 id="customSheetItemName">Item Name</h3>
+            <p id="customSheetItemDesc">Description</p>
+            <div class="sheet-unit-price" id="customSheetItemPrice">RM 0.00</div>
+          </div>
+          <button class="sheet-close-x close-sheet-btn">✕</button>
+        </div>
+        <div class="sheet-scroll-body" id="customSheetOptionsBody"></div>
+        <div class="sheet-action-footer">
+          <div class="stepper-bubble">
+            <button id="customStepMinus">-</button>
+            <span class="stepper-val" id="customStepQty">1</span>
+            <button id="customStepPlus">+</button>
+          </div>
+          <button class="btn-add-bag-confirm" id="btnConfirmAddToBag">
+            <span>Add to Bag</span>
+            <span id="customFooterPrice">• RM 0.00</span>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- MODAL: Review Bag & Checkout Bottom Sheet -->
+    <div class="app-sheet-backdrop" id="appCheckoutModal">
+      <div class="app-sheet-window" style="max-height: 94%;">
+        <div class="sheet-drag-bar"></div>
+        <div class="sheet-top-header">
+          <div>
+            <h3>My Order Bag</h3>
+            <p>Review your artisanal selections</p>
+          </div>
+          <button class="sheet-close-x close-sheet-btn">✕</button>
+        </div>
+        <div class="sheet-scroll-body">
+          <div id="checkoutItemsContainer"></div>
+
+          <div class="voucher-input-row" style="display:flex;gap:8px;margin:10px 0;">
+            <input type="text" id="appVoucherInput" placeholder="Promo code (e.g. SOGNO20)" value="SOGNO20" style="flex:1;padding:10px;border:1px solid #DDD;border-radius:8px;font-size:12px;outline:none;">
+            <button id="appApplyVoucherBtn" style="background:var(--sogno-maroon);color:#fff;border:none;padding:0 16px;border-radius:8px;font-weight:700;font-size:12px;cursor:pointer;">Apply</button>
+          </div>
+          <p id="appVoucherFeedback" style="font-size:11px;font-weight:700;display:none;margin-top:-4px;margin-bottom:12px;"></p>
+
+          <div style="margin:12px 0;">
+            <h5 style="font-size:12px;font-weight:800;text-transform:uppercase;margin-bottom:8px;">Payment Method</h5>
+            <div class="payment-grid" style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
+              <div class="payment-card active" style="padding:10px;border:1px solid var(--sogno-maroon);background:var(--sogno-maroon-light);border-radius:8px;font-size:11px;font-weight:700;display:flex;align-items:center;gap:6px;cursor:pointer;">
+                <span>📱</span>
+                <span>DuitNow QR / TNG</span>
+              </div>
+              <div class="payment-card" style="padding:10px;border:1px solid #DDD;border-radius:8px;font-size:11px;font-weight:700;display:flex;align-items:center;gap:6px;cursor:pointer;">
+                <span>💳</span>
+                <span>Card / Apple Pay</span>
+              </div>
+              <div class="payment-card" style="padding:10px;border:1px solid #DDD;border-radius:8px;font-size:11px;font-weight:700;display:flex;align-items:center;gap:6px;cursor:pointer;">
+                <span>🏦</span>
+                <span>Online FPX</span>
+              </div>
+              <div class="payment-card" style="padding:10px;border:1px solid #DDD;border-radius:8px;font-size:11px;font-weight:700;display:flex;align-items:center;gap:6px;cursor:pointer;">
+                <span>💵</span>
+                <span>Pay at Counter</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="price-breakdown" style="background:#F7F4EE;padding:12px;border-radius:12px;margin-bottom:16px;">
+            <div style="display:flex;justify-content:space-between;font-size:12px;color:#666;margin-bottom:4px;">
+              <span>Subtotal</span>
+              <span id="coSubtotalVal">RM 0.00</span>
+            </div>
+            <div style="display:flex;justify-content:space-between;font-size:12px;color:#666;margin-bottom:4px;">
+              <span>SST (6%)</span>
+              <span id="coTaxVal">RM 0.00</span>
+            </div>
+            <div style="display:flex;justify-content:space-between;font-size:12px;color:#666;margin-bottom:4px;">
+              <span>Delivery / Handling</span>
+              <span id="coDeliveryVal">FREE</span>
+            </div>
+            <div style="display:flex;justify-content:space-between;font-size:12px;color:#166534;font-weight:700;margin-bottom:4px;">
+              <span>Voucher Discount</span>
+              <span id="coDiscountVal">- RM 0.00</span>
+            </div>
+            <div style="display:flex;justify-content:space-between;font-size:16px;font-weight:900;color:var(--sogno-maroon);border-top:1px dashed #DDD;padding-top:8px;margin-top:6px;">
+              <span>Total Amount</span>
+              <span id="coFinalTotalVal">RM 0.00</span>
+            </div>
+          </div>
+
+          <button class="btn-add-bag-confirm" id="btnPlaceOrderFinal" style="width:100%;">
+            <span>Place Order & Pay</span>
+            <span>⚡</span>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- MODAL: Order Tracking & Counter QR -->
+    <div class="app-sheet-backdrop" id="appTrackingModal">
+      <div class="app-sheet-window">
+        <div class="sheet-drag-bar"></div>
+        <div class="order-tracking-modal" style="text-align:center;padding:24px 20px 30px;">
+          <div class="tracking-success-icon" style="width:60px;height:60px;background:#DCFCE7;color:#16A34A;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:28px;margin:0 auto 12px;">✓</div>
+          <h3 style="font-family:var(--font-editorial);font-size:20px;font-weight:800;color:var(--sogno-maroon-deep);">Order Sent to Kitchen!</h3>
+          <div class="order-code" id="appTrackingCode" style="font-size:13px;font-weight:800;color:var(--sogno-gold);background:#140407;display:inline-block;padding:4px 14px;border-radius:var(--radius-full);margin:8px 0 12px;">Order #SG-8821</div>
+          <p style="font-size:12px;color:#666;" id="appTrackingOutletLabel">Kota Bharu Flagship (Self-Pickup)</p>
+
+          <div class="status-timeline" style="display:flex;justify-content:space-between;margin:20px 0;">
+            <div class="timeline-step active" style="display:flex;flex-direction:column;align-items:center;gap:4px;width:33%;">
+              <div class="step-circle active" style="width:28px;height:28px;border-radius:50%;background:var(--sogno-maroon);color:#fff;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;">1</div>
+              <span style="font-size:10px;font-weight:700;color:var(--sogno-maroon);">Received</span>
+            </div>
+            <div class="timeline-step" id="stepBakerActive" style="display:flex;flex-direction:column;align-items:center;gap:4px;width:33%;">
+              <div class="step-circle" style="width:28px;height:28px;border-radius:50%;background:#E5E7EB;color:#888;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;">2</div>
+              <span style="font-size:10px;font-weight:600;color:#888;">Barista & Baker</span>
+            </div>
+            <div class="timeline-step" style="display:flex;flex-direction:column;align-items:center;gap:4px;width:33%;">
+              <div class="step-circle" style="width:28px;height:28px;border-radius:50%;background:#E5E7EB;color:#888;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;">3</div>
+              <span style="font-size:10px;font-weight:600;color:#888;">Ready for Pickup</span>
+            </div>
+          </div>
+
+          <div class="qr-code-box" style="background:#F9FAFB;border:1px solid #E5E7EB;border-radius:16px;padding:16px;display:inline-block;margin:10px 0;">
+            <div class="qr-mock" style="width:130px;height:130px;background:repeating-conic-gradient(#140407 0% 25%, #FFFFFF 0% 50%) 50% / 18px 18px;border-radius:8px;"></div>
+            <p style="font-size:11px;color:#666;margin-top:8px;">Scan at the counter for contactless collection</p>
+          </div>
+
+          <div style="margin-top:16px;">
+            <button class="btn-add-bag-confirm close-sheet-btn" style="width:100%;">
+              <span>Done / Back to Menu</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <script src="assets/js/menu-data.js"></script>
+  <script src="assets/js/app.js"></script>
+</body>
+</html>

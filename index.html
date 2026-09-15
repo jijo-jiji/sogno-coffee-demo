@@ -1,0 +1,1010 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Sogno Coffee | Artisan Viennoiserie & Specialty Coffee</title>
+  <meta name="description" content="Sogno Coffee - Un Sogno Diventato Realtà. Premium artisan pastries, signature Buttercream Latte, and craft brews. Kota Bharu Flagship & Klang Valley.">
+  <link rel="icon" type="image/png" href="assets/images/logo.png">
+  
+  <!-- High-End Typography Benchmarks (Kenangan, ZUS, Perk Coffee, CBTL) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700;800;900&family=Playfair+Display:ital,wght@0,500;0,700;0,900;1,400;1,600&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
+  
+  <link rel="stylesheet" href="assets/css/style.css">
+  <link rel="stylesheet" href="assets/css/landing.css">
+  <style>
+    .view-content-section {
+      display: none;
+    }
+    .view-content-section.active-view {
+      display: block;
+    }
+    #viewSimulator.active-view {
+      display: flex;
+    }
+    .device-controls-group {
+      display: flex;
+      gap: 6px;
+    }
+    .outlet-modal-card {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 14px 16px;
+      border: 1px solid var(--surface-border);
+      border-radius: var(--radius-md);
+      margin-bottom: 10px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .outlet-modal-card:hover, .outlet-modal-card.active {
+      border-color: var(--sogno-maroon);
+      background: var(--sogno-maroon-light);
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Persistent Master Control Bar (Demo & Switcher) -->
+  <header class="sogno-top-demo-bar">
+    <div class="demo-brand-tag">
+      <img src="assets/images/logo.png" alt="Sogno Coffee Logo">
+      <div class="demo-brand-name">
+        <h1>SOGNO COFFEE</h1>
+        <span>Artisan Viennoiserie & Specialty Coffee</span>
+      </div>
+    </div>
+
+    <!-- Mode Switcher Navigation (Landing vs ZUS App vs Pitch Deck) -->
+    <nav class="demo-view-tabs">
+      <button class="demo-tab-btn active" data-view="landing">
+        <span>🌟 Brand Experience</span>
+      </button>
+      <button class="demo-tab-btn" data-view="simulator">
+        <span>📱 ZUS-Style App Simulator</span>
+      </button>
+      <button class="demo-tab-btn" data-view="pitch">
+        <span>📋 Owner Pitch & Photo List</span>
+      </button>
+    </nav>
+
+    <div class="demo-side-cta">
+      <div id="frameControls" class="device-controls-group" style="display: none;">
+        <button class="sim-toggle-btn active" id="btnPhoneFrame">📱 iPhone Frame</button>
+        <button class="sim-toggle-btn" id="btnExpandedFrame">🖥️ Full App</button>
+      </div>
+      <a href="app.html" target="_blank" class="btn-open-app-live" title="Open Mobile Ordering directly in new tab">
+        <span>🔗 Open Standalone App</span>
+      </a>
+    </div>
+  </header>
+
+  <!-- =========================================================================
+       VIEW 1: LUXURY BRAND LANDING PAGE (Kenangan, Perk, ZUS, CBTL benchmark)
+       ========================================================================= -->
+  <main id="viewLanding" class="view-content-section active-view sogno-landing-wrapper">
+    
+    <!-- Top Announcement Strip (Kenangan & CBTL benchmark) -->
+    <div class="luxury-top-strip">
+      <span>Un Sogno Diventato Realtà</span>
+      <span class="dot-sep">•</span>
+      <span>Kota Bharu Flagship & Klang Valley</span>
+      <span class="dot-sep">•</span>
+      <span>100% Specialty Grade Arabica</span>
+      <span class="dot-sep">•</span>
+      <span>Daily Fresh Baked Viennoiserie</span>
+    </div>
+
+    <!-- Editorial Hero Section -->
+    <section class="editorial-hero">
+      <div class="hero-ambient-glow"></div>
+      <div class="hero-ambient-glow-2"></div>
+      
+      <div class="hero-grid-container">
+        <!-- Left Column: Copy & CTAs -->
+        <div class="hero-copy-column">
+          <div class="hero-origin-badge">
+            <span class="bean-icon">☕</span>
+            <span>Kota Bharu Flagship • SOGNO COFFEE SDN BHD</span>
+          </div>
+
+          <h2 class="hero-headline-editorial">
+            The Art of Viennoiserie.<br>
+            <em>The Soul of Italian Coffee.</em>
+          </h2>
+
+          <p class="hero-lead-text">
+            "Sogno" means <em>Dream</em> in Italian. We combine the French tradition of slow-fermented, golden-laminated butter croissants with bold, velvety Arabica extractions. From our viral 40cm Jumbo Croissant to the signature Buttercream Latte, every creation is a dream come true.
+          </p>
+
+          <div class="hero-buttons-row">
+            <button class="btn-hero-solid" id="heroOrderAppBtn">
+              <span>📱 Order Ahead (Pick Up in 10 Mins)</span>
+              <span style="font-size:16px;">→</span>
+            </button>
+            <a href="#sectionChillerShowcase" class="btn-hero-glass">
+              <span>🥐 Explore Pastry Chiller</span>
+            </a>
+          </div>
+        </div>
+
+        <!-- Right Column: Visual Product Showcase Card (Perk & Kenangan Benchmark) -->
+        <div class="hero-visual-card">
+          <div class="visual-top-badge">
+            <span class="live-oven-chip">
+              <span class="live-dot-pulse"></span>
+              <span>Fresh Batch: Out of Oven</span>
+            </span>
+            <span style="font-size:11px;color:var(--sogno-gold);font-weight:700;">Artisan Batch #04</span>
+          </div>
+
+          <div class="visual-item-display">
+            <div class="hero-chiller-thumb">
+              <img src="assets/images/pastry_chiller.png" alt="Sogno Coffee Pastry Chiller Display">
+            </div>
+            <div class="hero-featured-details">
+              <div class="featured-category">Signature Highlight</div>
+              <h4>Kunafa Pistachio</h4>
+              <p>Middle Eastern crispy toasted kataifi shreds with rich pistachio praline cream in flaky butter croissant.</p>
+              <div class="hero-price-tag">RM 18.90</div>
+            </div>
+          </div>
+
+          <!-- Sensory Flavor Profile Notes (Perk Coffee benchmark) -->
+          <div class="hero-tasting-notes-strip">
+            <div class="tasting-label">Sensory Tasting Profile</div>
+            <div class="tasting-tags-list">
+              <span class="tasting-pill-gold">Crispy Kataifi Crunch</span>
+              <span class="tasting-pill-gold">Sicilian Pistachio</span>
+              <span class="tasting-pill-gold">Normandy Butter Honey</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Roast Profile & Craft Section (Perk Coffee & Kenangan benchmark) -->
+    <section class="craft-profile-banner">
+      <div class="craft-container">
+        <div class="craft-metric-card">
+          <div class="metric-icon-box">☕</div>
+          <div class="metric-text-box">
+            <h5>House Roast Profile</h5>
+            <p>Medium-Dark Velvet Roast</p>
+          </div>
+        </div>
+
+        <div class="craft-metric-card">
+          <div class="metric-icon-box">🌱</div>
+          <div class="metric-text-box">
+            <h5>Bean Terroir & Origin</h5>
+            <p>100% Arabica (Colombia & Brazil)</p>
+          </div>
+        </div>
+
+        <div class="craft-metric-card">
+          <div class="metric-icon-box">🥐</div>
+          <div class="metric-text-box">
+            <h5>Bakery Standard</h5>
+            <p>72-Hour Laminated French Butter</p>
+          </div>
+        </div>
+
+        <div class="craft-metric-card">
+          <div class="metric-icon-box">⚡</div>
+          <div class="metric-text-box">
+            <h5>Speed of Service</h5>
+            <p>Ready for Pickup in 8-12 Mins</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Authentic Chiller & Storefront Showcase (Real Photos) -->
+    <section id="sectionChillerShowcase" class="chiller-showcase-section">
+      <div class="editorial-section-heading">
+        <span class="editorial-pill-tag">Authentic Store Showcase</span>
+        <h3 class="editorial-main-title">Crafted Behind The Counter at Sogno</h3>
+        <p class="editorial-lead-para">
+          Step into our Kota Bharu flagship café. Witness the golden crusts, the aroma of freshly pulled double ristrettos, and our showcase chiller loaded fresh every morning.
+        </p>
+      </div>
+
+      <div class="editorial-gallery-grid">
+        <!-- Card 1: Storefront Photo -->
+        <div class="gallery-editorial-card">
+          <div class="gallery-media-frame">
+            <img src="assets/images/storefront.png" alt="Sogno Coffee Exterior Storefront Kota Bharu">
+            <span class="gallery-badge-overlay">Kota Bharu Flagship</span>
+          </div>
+          <div class="gallery-content-block">
+            <div>
+              <h4>Flagship Storefront & Café</h4>
+              <p>
+                Featuring our deep burgundy canopy with illuminated 3D channel lettering and welcoming outdoor alfresco seating. Designed as an inviting neighborhood sanctuary for coffee purists and brunch goers.
+              </p>
+            </div>
+            <div class="chiller-hotspots-pills">
+              <span class="chiller-item-chip">📍 Lembah Sireh, Kota Bharu</span>
+              <span class="chiller-item-chip">🕒 8:00 AM - 11:30 PM Daily</span>
+              <span class="chiller-item-chip">🚗 Drive-By & Dine-In</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Card 2: Chiller Display Photo -->
+        <div class="gallery-editorial-card">
+          <div class="gallery-media-frame">
+            <img src="assets/images/pastry_chiller.png" alt="Sogno Coffee Pastry Chiller Display">
+            <span class="gallery-badge-overlay">Daily Pastry Chiller</span>
+          </div>
+          <div class="gallery-content-block">
+            <div>
+              <h4>The Artisan Pastry Chiller</h4>
+              <p>
+                Our signature three-tier refrigerated display featuring the legendary 40cm Jumbo Croissant, vibrant Red Velvet Croissants, Kataifi Kunafa, and fruit danishes baked daily by our viennoiserie masters.
+              </p>
+            </div>
+            <div class="chiller-hotspots-pills">
+              <span class="chiller-item-chip">⭐ Jumbo Croissant (RM 40.00)</span>
+              <span class="chiller-item-chip">⭐ Red Velvet Croissant (RM 21.00)</span>
+              <span class="chiller-item-chip">⭐ Kunafa Pistachio (RM 18.90)</span>
+              <span class="chiller-item-chip">⭐ Cinnamon Roll (RM 8.00)</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Interactive Menu Explorer (Bask Bear & Kenangan Style) -->
+    <section class="menu-explorer-section">
+      <div class="menu-explorer-container">
+        <div class="editorial-section-heading">
+          <span class="editorial-pill-tag">The Core Collection</span>
+          <h3 class="editorial-main-title">Sensory Menu & Verified Pricing</h3>
+          <p class="editorial-lead-para">
+            Every item calibrated for distinct flavor profiles, paired perfectly with our specialty beverage lineup.
+          </p>
+        </div>
+
+        <!-- Category Navigator Tabs -->
+        <div class="menu-tabs-navigator" id="landingCatNav">
+          <button class="menu-category-btn active" data-cat="all">
+            <span>✨ All Signatures</span>
+          </button>
+          <button class="menu-category-btn" data-cat="pastry-sogno">
+            <span>🥐 Pastry Sogno</span>
+          </button>
+          <button class="menu-category-btn" data-cat="coffee">
+            <span>☕ Specialty Coffee</span>
+          </button>
+          <button class="menu-category-btn" data-cat="frappe">
+            <span>🥤 Frappe Dream</span>
+          </button>
+          <button class="menu-category-btn" data-cat="milk-series">
+            <span>🥛 Milk Series</span>
+          </button>
+        </div>
+
+        <!-- Menu Cards Grid -->
+        <div class="menu-cards-showcase-grid" id="landingMenuCardsGrid">
+          <!-- Dynamically populated by JS from menu-data.js -->
+        </div>
+      </div>
+    </section>
+
+    <!-- ZUS Coffee App Benchmark Section -->
+    <section class="zus-app-ecosystem-section">
+      <div class="ecosystem-container">
+        <div class="ecosystem-copy">
+          <span class="editorial-pill-tag" style="background:rgba(201,147,85,0.2);color:var(--sogno-gold);">ZUS Layout Benchmark</span>
+          <h3>Skip the Physical Queue.<br><em>Freshly Crafted in 10 Mins.</em></h3>
+          <p>
+            Experience the future of Malaysian café culture. Seamlessly order on your phone before arriving, customise your sweetness and milk alternatives, and pick up your hot bakes with zero waiting.
+          </p>
+
+          <div class="step-process-list">
+            <div class="step-row-item">
+              <div class="step-num-box">1</div>
+              <div class="step-desc-col">
+                <h6>Choose Store & Order Type</h6>
+                <span>Select Kota Bharu HQ, Bachok, Shah Alam, or Ampang for Self-Pickup or Delivery.</span>
+              </div>
+            </div>
+
+            <div class="step-row-item">
+              <div class="step-num-box">2</div>
+              <div class="step-desc-col">
+                <h6>Customise to Your Palate</h6>
+                <span>Choose temperature, 50% less sweet, oat milk, or freshly reheated pastries.</span>
+              </div>
+            </div>
+
+            <div class="step-row-item">
+              <div class="step-num-box">3</div>
+              <div class="step-desc-col">
+                <h6>Instant Counter Pickup with QR</h6>
+                <span>Show your dynamic order QR at the barista counter and enjoy.</span>
+              </div>
+            </div>
+          </div>
+
+          <button class="btn-hero-solid" id="btnLaunchAppFromEcosystem">
+            <span>📱 Try Interactive Mobile App</span>
+            <span style="font-size:16px;">→</span>
+          </button>
+        </div>
+
+        <div class="qr-code-interactive-card">
+          <h4 style="font-family:var(--font-editorial);font-size:20px;color:#fff;margin-bottom:8px;">Instant Counter Pickup</h4>
+          <p style="font-size:12px;color:var(--text-on-dark-subtle);margin-bottom:20px;">Scan or click to simulate counter pickup experience</p>
+          <div class="mock-qr"></div>
+          <div style="font-size:13px;font-weight:800;color:var(--sogno-gold);">Order #SG-8821 • Active</div>
+          <span style="font-size:11px;color:#AAA;display:block;margin-top:4px;">Ready at Kota Bharu Flagship</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- Outlets Section -->
+    <section class="outlets-locator-section">
+      <div class="editorial-section-heading">
+        <span class="editorial-pill-tag">Our Outlets</span>
+        <h3 class="editorial-main-title">Experience Sogno In Person</h3>
+        <p class="editorial-lead-para">From our Kelantan roastery to rapid expansion across Selangor and Kuala Lumpur.</p>
+      </div>
+
+      <div class="outlets-showcase-grid">
+        <div class="outlet-luxury-box">
+          <div class="outlet-box-top">
+            <span class="outlet-open-status">● Open Daily</span>
+            <span style="font-size:11px;font-weight:700;color:var(--sogno-gold);">HQ & Roastery</span>
+          </div>
+          <div>
+            <h4>Kota Bharu Flagship</h4>
+            <p class="outlet-addr-txt">PT 482, Jalan Lembah Sireh, 15050 Kota Bharu, Kelantan</p>
+          </div>
+          <div class="outlet-contact-row">
+            <span>🕒 8:00 AM - 11:30 PM</span>
+            <span>📞 +60 9-743 2889</span>
+          </div>
+        </div>
+
+        <div class="outlet-luxury-box">
+          <div class="outlet-box-top">
+            <span class="outlet-open-status">● Open Daily</span>
+            <span style="font-size:11px;font-weight:700;color:var(--sogno-gold);">Beachside #6</span>
+          </div>
+          <div>
+            <h4>Pantai Tapang, Bachok</h4>
+            <p class="outlet-addr-txt">Pantai Tapang, 16300 Bachok, Kelantan</p>
+          </div>
+          <div class="outlet-contact-row">
+            <span>🕒 9:00 AM - 11:00 PM</span>
+            <span>📞 +60 19-980 4455</span>
+          </div>
+        </div>
+
+        <div class="outlet-luxury-box">
+          <div class="outlet-box-top">
+            <span class="outlet-open-status">● Open Daily</span>
+            <span style="font-size:11px;font-weight:700;color:var(--sogno-gold);">Klang Valley</span>
+          </div>
+          <div>
+            <h4>Shah Alam Seksyen 7</h4>
+            <p class="outlet-addr-txt">No. 14, Jalan Plumbum Q7/Q, Seksyen 7, 40000 Shah Alam, Selangor</p>
+          </div>
+          <div class="outlet-contact-row">
+            <span>🕒 8:30 AM - 11:00 PM</span>
+            <span>📞 +60 3-5524 8192</span>
+          </div>
+        </div>
+
+        <div class="outlet-luxury-box">
+          <div class="outlet-box-top">
+            <span class="outlet-open-status">● Open Daily</span>
+            <span style="font-size:11px;font-weight:700;color:var(--sogno-gold);">Klang Valley</span>
+          </div>
+          <div>
+            <h4>Ampang Point</h4>
+            <p class="outlet-addr-txt">Lot G-12, Ampang Point Shopping Centre, 68000 Ampang, Selangor</p>
+          </div>
+          <div class="outlet-contact-row">
+            <span>🕒 8:00 AM - 10:30 PM</span>
+            <span>📞 +60 3-4251 6720</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="luxury-editorial-footer">
+      <div class="footer-emblem">
+        <img src="assets/images/logo.png" alt="Sogno Logo">
+      </div>
+      <p style="font-family:var(--font-luxury);font-size:15px;color:#FFFFFF;letter-spacing:2px;margin-bottom:6px;">
+        SOGNO COFFEE SDN BHD (202301012275)
+      </p>
+      <p style="color:var(--sogno-gold);font-size:12px;margin-bottom:14px;">
+        Un Sogno Diventato Realtà — Artisan Pastry & Specialty Coffee
+      </p>
+      <p style="color:#666;font-size:11px;">
+        Benchmarked against ZUS Coffee, Kenangan Coffee, Bask Bear, Perk Coffee & Coffee Bean Malaysia.
+      </p>
+    </footer>
+  </main>
+
+  <!-- =========================================================================
+       VIEW 2: ZUS COFFEE BENCHMARK MOBILE APP SIMULATOR
+       ========================================================================= -->
+  <main id="viewSimulator" class="view-content-section simulator-wrapper">
+    <!-- Frame Mode Switcher -->
+    <div class="simulator-device-bar">
+      <span style="font-size:11px;color:#AAA;">Device Display:</span>
+      <button class="sim-toggle-btn active" id="simPhoneBtn">iPhone 16 Pro Frame</button>
+      <button class="sim-toggle-btn" id="simExpandedBtn">Expanded View</button>
+    </div>
+
+    <!-- Smartphone Frame -->
+    <div class="iphone-frame" id="simMockupFrame">
+      <div class="iphone-screen">
+        
+        <!-- Status Bar -->
+        <div class="iphone-top-island">
+          <span>9:41</span>
+          <div class="notch-pill"></div>
+          <span>5G 100%</span>
+        </div>
+
+        <!-- ZUS-Style App Header -->
+        <header class="app-header-zus">
+          <div class="app-store-line">
+            <div class="app-store-pill" id="appStoreDropdownTrigger" title="Tap to switch branch">
+              <div class="store-pin-circle">📍</div>
+              <div class="store-name-col">
+                <h2 id="appSelectedStoreName">Kota Bharu Flagship ▾</h2>
+                <span id="appStoreTimeSub">Ready in 10-15 mins • Self-Pickup</span>
+              </div>
+            </div>
+            
+            <div class="pickup-delivery-toggle">
+              <button class="toggle-choice-btn active" id="appTogglePickup">Pickup</button>
+              <button class="toggle-choice-btn" id="appToggleDelivery">Delivery</button>
+            </div>
+          </div>
+
+          <!-- Search Bar -->
+          <div class="app-search-wrap">
+            <span class="search-glass-icon">🔍</span>
+            <input type="text" id="appSearchInput" placeholder="Search croissants, buttercream latte, frappe...">
+          </div>
+        </header>
+
+        <!-- Scrollable Content -->
+        <div class="app-scroll-body">
+          <!-- Sogno Club VIP Bar (ZUS Club benchmark) -->
+          <div class="sogno-vip-strip">
+            <div class="vip-left">
+              <div class="vip-icon-emblem">☕</div>
+              <div class="vip-text">
+                <h4>Sogno Club <span class="vip-tier-badge">Silver Tier</span></h4>
+                <p>6 / 10 Sips to Next Free Buttercream Latte</p>
+              </div>
+            </div>
+            <span class="vip-voucher-tag">20% OFF Active</span>
+          </div>
+
+          <!-- Promotional Banner Slider -->
+          <div class="app-promo-card">
+            <div class="app-promo-content">
+              <span class="app-promo-badge">Fresh Oven Batch</span>
+              <h3>Kunafa Pistachio Croissant</h3>
+              <p>Toasted kataifi shreds & Sicilian pistachio praline.</p>
+            </div>
+            <div class="app-promo-thumb">
+              <img src="assets/images/pastry_chiller.png" alt="Chiller thumbnail">
+            </div>
+          </div>
+
+          <!-- Sticky Category Nav Pills (ZUS Benchmark) -->
+          <nav class="app-category-bar" id="appCategoryNavPills">
+            <!-- Dynamically populated by JS -->
+          </nav>
+
+          <!-- Products List -->
+          <div id="appProductsContainer">
+            <!-- Dynamically populated by JS -->
+          </div>
+        </div>
+
+        <!-- Floating Cart Pill (ZUS Benchmark) -->
+        <div class="app-floating-cart-pill" id="appFloatingCart" style="display: none;">
+          <div class="cart-left-block">
+            <div class="cart-counter-bubble" id="appCartCount">0</div>
+            <div class="cart-pricing-col">
+              <strong id="appCartTotal">RM 0.00</strong>
+              <span id="appCartOrderTypeLabel">Self-Pickup</span>
+            </div>
+          </div>
+          <div class="cart-right-block">
+            <span>View Bag</span>
+            <span>→</span>
+          </div>
+        </div>
+
+        <!-- MODAL: Outlet Selector Bottom Sheet -->
+        <div class="app-sheet-backdrop" id="appOutletModal">
+          <div class="app-sheet-window">
+            <div class="sheet-drag-bar"></div>
+            <div class="sheet-top-header">
+              <div>
+                <h3>Select Sogno Outlet</h3>
+                <p>Choose the nearest kitchen for live prep</p>
+              </div>
+              <button class="sheet-close-x close-sheet-btn">✕</button>
+            </div>
+            <div class="sheet-scroll-body" id="appOutletListOptions">
+              <!-- Dynamically populated -->
+            </div>
+          </div>
+        </div>
+
+        <!-- MODAL: Customization Bottom Sheet -->
+        <div class="app-sheet-backdrop" id="appCustomModal">
+          <div class="app-sheet-window">
+            <div class="sheet-drag-bar"></div>
+            <div class="sheet-top-header">
+              <div>
+                <h3 id="customSheetItemName">Item Name</h3>
+                <p id="customSheetItemDesc">Description</p>
+                <div class="sheet-unit-price" id="customSheetItemPrice">RM 0.00</div>
+              </div>
+              <button class="sheet-close-x close-sheet-btn">✕</button>
+            </div>
+            <div class="sheet-scroll-body" id="customSheetOptionsBody">
+              <!-- Dynamically populated options -->
+            </div>
+            <div class="sheet-action-footer">
+              <div class="stepper-bubble">
+                <button id="customStepMinus">-</button>
+                <span class="stepper-val" id="customStepQty">1</span>
+                <button id="customStepPlus">+</button>
+              </div>
+              <button class="btn-add-bag-confirm" id="btnConfirmAddToBag">
+                <span>Add to Bag</span>
+                <span id="customFooterPrice">• RM 0.00</span>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- MODAL: Review Bag & Checkout Bottom Sheet -->
+        <div class="app-sheet-backdrop" id="appCheckoutModal">
+          <div class="app-sheet-window" style="max-height: 94%;">
+            <div class="sheet-drag-bar"></div>
+            <div class="sheet-top-header">
+              <div>
+                <h3>My Order Bag</h3>
+                <p>Review your artisanal selections</p>
+              </div>
+              <button class="sheet-close-x close-sheet-btn">✕</button>
+            </div>
+            <div class="sheet-scroll-body">
+              <div id="checkoutItemsContainer"></div>
+
+              <!-- Promo Code Input -->
+              <div class="voucher-input-row" style="display:flex;gap:8px;margin:10px 0;">
+                <input type="text" id="appVoucherInput" placeholder="Promo code (e.g. SOGNO20)" value="SOGNO20" style="flex:1;padding:10px;border:1px solid #DDD;border-radius:8px;font-size:12px;outline:none;">
+                <button id="appApplyVoucherBtn" style="background:var(--sogno-maroon);color:#fff;border:none;padding:0 16px;border-radius:8px;font-weight:700;font-size:12px;cursor:pointer;">Apply</button>
+              </div>
+              <p id="appVoucherFeedback" style="font-size:11px;font-weight:700;display:none;margin-top:-4px;margin-bottom:12px;"></p>
+
+              <!-- Payment Method Selection -->
+              <div style="margin:12px 0;">
+                <h5 style="font-size:12px;font-weight:800;text-transform:uppercase;margin-bottom:8px;">Payment Method</h5>
+                <div class="payment-grid" style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
+                  <div class="payment-card active" style="padding:10px;border:1px solid var(--sogno-maroon);background:var(--sogno-maroon-light);border-radius:8px;font-size:11px;font-weight:700;display:flex;align-items:center;gap:6px;cursor:pointer;">
+                    <span>📱</span>
+                    <span>DuitNow QR / TNG</span>
+                  </div>
+                  <div class="payment-card" style="padding:10px;border:1px solid #DDD;border-radius:8px;font-size:11px;font-weight:700;display:flex;align-items:center;gap:6px;cursor:pointer;">
+                    <span>💳</span>
+                    <span>Card / Apple Pay</span>
+                  </div>
+                  <div class="payment-card" style="padding:10px;border:1px solid #DDD;border-radius:8px;font-size:11px;font-weight:700;display:flex;align-items:center;gap:6px;cursor:pointer;">
+                    <span>🏦</span>
+                    <span>Online FPX</span>
+                  </div>
+                  <div class="payment-card" style="padding:10px;border:1px solid #DDD;border-radius:8px;font-size:11px;font-weight:700;display:flex;align-items:center;gap:6px;cursor:pointer;">
+                    <span>💵</span>
+                    <span>Pay at Counter</span>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Price Breakdown -->
+              <div class="price-breakdown" style="background:#F7F4EE;padding:12px;border-radius:12px;margin-bottom:16px;">
+                <div style="display:flex;justify-content:space-between;font-size:12px;color:#666;margin-bottom:4px;">
+                  <span>Subtotal</span>
+                  <span id="coSubtotalVal">RM 0.00</span>
+                </div>
+                <div style="display:flex;justify-content:space-between;font-size:12px;color:#666;margin-bottom:4px;">
+                  <span>SST (6%)</span>
+                  <span id="coTaxVal">RM 0.00</span>
+                </div>
+                <div style="display:flex;justify-content:space-between;font-size:12px;color:#666;margin-bottom:4px;">
+                  <span>Delivery / Handling</span>
+                  <span id="coDeliveryVal">FREE</span>
+                </div>
+                <div style="display:flex;justify-content:space-between;font-size:12px;color:#166534;font-weight:700;margin-bottom:4px;">
+                  <span>Voucher Discount</span>
+                  <span id="coDiscountVal">- RM 0.00</span>
+                </div>
+                <div style="display:flex;justify-content:space-between;font-size:16px;font-weight:900;color:var(--sogno-maroon);border-top:1px dashed #DDD;padding-top:8px;margin-top:6px;">
+                  <span>Total Amount</span>
+                  <span id="coFinalTotalVal">RM 0.00</span>
+                </div>
+              </div>
+
+              <button class="btn-add-bag-confirm" id="btnPlaceOrderFinal" style="width:100%;">
+                <span>Place Order & Pay</span>
+                <span>⚡</span>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- MODAL: Order Tracking & Counter QR -->
+        <div class="app-sheet-backdrop" id="appTrackingModal">
+          <div class="app-sheet-window">
+            <div class="sheet-drag-bar"></div>
+            <div class="order-tracking-modal" style="text-align:center;padding:24px 20px 30px;">
+              <div class="tracking-success-icon" style="width:60px;height:60px;background:#DCFCE7;color:#16A34A;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:28px;margin:0 auto 12px;">✓</div>
+              <h3 style="font-family:var(--font-editorial);font-size:20px;font-weight:800;color:var(--sogno-maroon-deep);">Order Sent to Kitchen!</h3>
+              <div class="order-code" id="appTrackingCode" style="font-size:13px;font-weight:800;color:var(--sogno-gold);background:#140407;display:inline-block;padding:4px 14px;border-radius:var(--radius-full);margin:8px 0 12px;">Order #SG-8821</div>
+              <p style="font-size:12px;color:#666;" id="appTrackingOutletLabel">Kota Bharu Flagship (Self-Pickup)</p>
+
+              <!-- Status Steps -->
+              <div class="status-timeline" style="display:flex;justify-content:space-between;margin:20px 0;">
+                <div class="timeline-step active" style="display:flex;flex-direction:column;align-items:center;gap:4px;width:33%;">
+                  <div class="step-circle active" style="width:28px;height:28px;border-radius:50%;background:var(--sogno-maroon);color:#fff;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;">1</div>
+                  <span style="font-size:10px;font-weight:700;color:var(--sogno-maroon);">Received</span>
+                </div>
+                <div class="timeline-step" id="stepBakerActive" style="display:flex;flex-direction:column;align-items:center;gap:4px;width:33%;">
+                  <div class="step-circle" style="width:28px;height:28px;border-radius:50%;background:#E5E7EB;color:#888;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;">2</div>
+                  <span style="font-size:10px;font-weight:600;color:#888;">Barista & Baker</span>
+                </div>
+                <div class="timeline-step" style="display:flex;flex-direction:column;align-items:center;gap:4px;width:33%;">
+                  <div class="step-circle" style="width:28px;height:28px;border-radius:50%;background:#E5E7EB;color:#888;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;">3</div>
+                  <span style="font-size:10px;font-weight:600;color:#888;">Ready for Pickup</span>
+                </div>
+              </div>
+
+              <!-- Pickup QR Code -->
+              <div class="qr-code-box" style="background:#F9FAFB;border:1px solid #E5E7EB;border-radius:16px;padding:16px;display:inline-block;margin:10px 0;">
+                <div class="qr-mock" style="width:130px;height:130px;background:repeating-conic-gradient(#140407 0% 25%, #FFFFFF 0% 50%) 50% / 18px 18px;border-radius:8px;"></div>
+                <p style="font-size:11px;color:#666;margin-top:8px;">Scan at the counter for contactless collection</p>
+              </div>
+
+              <div style="margin-top:16px;">
+                <button class="btn-add-bag-confirm close-sheet-btn" style="width:100%;">
+                  <span>Done / Back to Menu</span>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </main>
+
+  <!-- =========================================================================
+       VIEW 3: OWNER PITCH & PHOTOGRAPHY CHECKLIST
+       ========================================================================= -->
+  <main id="viewPitch" class="view-content-section checklist-section">
+    <div class="checklist-inner">
+      <div class="editorial-section-heading" style="text-align:left;margin-bottom:30px;">
+        <span class="editorial-pill-tag">Owner Pitch Strategy</span>
+        <h3 class="editorial-main-title">Winning Over the Founder of Sogno Coffee</h3>
+        <p class="editorial-lead-para" style="margin:0;">
+          Why this platform is a game-changer for their business model — solving morning congestion, boosting high-ticket pastry orders, and driving loyalty retention.
+        </p>
+      </div>
+
+      <!-- 4 Strategic Pillars -->
+      <div class="pitch-grid" style="display:grid;grid-template-columns:repeat(auto-fit, minmax(260px, 1fr));gap:24px;margin-bottom:60px;">
+        <div class="pitch-box" style="background:#FFFFFF;border:1px solid var(--surface-border);border-radius:var(--radius-lg);padding:24px;box-shadow:var(--shadow-subtle);">
+          <div style="font-family:var(--font-mono);font-size:28px;font-weight:900;color:var(--sogno-maroon);margin-bottom:6px;">01</div>
+          <h4 style="font-family:var(--font-editorial);font-size:18px;font-weight:800;color:var(--sogno-maroon-deep);margin-bottom:8px;">Pastry Pre-Order & Waste Elimination</h4>
+          <p style="font-size:13px;color:var(--text-secondary);line-height:1.5;">
+            Artisan pastries like <strong>Kunafa Pistachio</strong> and the viral <strong>Jumbo Croissant</strong> take hours to laminate and bake. Allowing app pre-orders gives the kitchen exact demand counts before 10 AM, eliminating stockouts and wastage.
+          </p>
+        </div>
+
+        <div class="pitch-box" style="background:#FFFFFF;border:1px solid var(--surface-border);border-radius:var(--radius-lg);padding:24px;box-shadow:var(--shadow-subtle);">
+          <div style="font-family:var(--font-mono);font-size:28px;font-weight:900;color:var(--sogno-maroon);margin-bottom:6px;">02</div>
+          <h4 style="font-family:var(--font-editorial);font-size:18px;font-weight:800;color:var(--sogno-maroon-deep);margin-bottom:8px;">The 3-Minute Pickup Surge (ZUS Benchmark)</h4>
+          <p style="font-size:13px;color:var(--text-secondary);line-height:1.5;">
+            Morning commuters avoid physical queues. An effortless in-app <strong>Self-Pickup</strong> flow enables patrons to order during their commute, doubling peak-hour coffee sales without crowding the counter.
+          </p>
+        </div>
+
+        <div class="pitch-box" style="background:#FFFFFF;border:1px solid var(--surface-border);border-radius:var(--radius-lg);padding:24px;box-shadow:var(--shadow-subtle);">
+          <div style="font-family:var(--font-mono);font-size:28px;font-weight:900;color:var(--sogno-maroon);margin-bottom:6px;">03</div>
+          <h4 style="font-family:var(--font-editorial);font-size:18px;font-weight:800;color:var(--sogno-maroon-deep);margin-bottom:8px;">"Sogno Club" Repeat LTV Retention</h4>
+          <p style="font-size:13px;color:var(--text-secondary);line-height:1.5;">
+            Replacing easily lost paper cards with an automated digital stamp tracker (*10 Sips to a Free Buttercream Latte*) locks in weekly customer habits and protects against competitors.
+          </p>
+        </div>
+
+        <div class="pitch-box" style="background:#FFFFFF;border:1px solid var(--surface-border);border-radius:var(--radius-lg);padding:24px;box-shadow:var(--shadow-subtle);">
+          <div style="font-family:var(--font-mono);font-size:28px;font-weight:900;color:var(--sogno-maroon);margin-bottom:6px;">04</div>
+          <h4 style="font-family:var(--font-editorial);font-size:18px;font-weight:800;color:var(--sogno-maroon-deep);margin-bottom:8px;">Enterprise Multi-Outlet Management</h4>
+          <p style="font-size:13px;color:var(--text-secondary);line-height:1.5;">
+            With branches in <strong>Kota Bharu</strong>, <strong>Bachok</strong>, <strong>Shah Alam</strong>, and <strong>Ampang</strong>, the platform is structured for centralized menu control with outlet-specific pricing and stock tracking.
+          </p>
+        </div>
+      </div>
+
+      <!-- Photography Checklist Table -->
+      <div class="editorial-section-heading" style="text-align:left;margin-bottom:20px;">
+        <span class="editorial-pill-tag">Photography Checklist</span>
+        <h3 class="editorial-main-title" style="font-size:26px;">Real Photos Active vs. Photos Needed</h3>
+        <p class="editorial-lead-para" style="margin:0;">No AI-generated pictures have been used. Here is the exact status of your asset library:</p>
+      </div>
+
+      <table class="checklist-table">
+        <thead>
+          <tr>
+            <th>Item / Subject</th>
+            <th>Category</th>
+            <th>Exact Price</th>
+            <th>Current Asset Status</th>
+            <th>Action Needed</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>Official Brand Logo</strong></td>
+            <td>Brand Identity</td>
+            <td>—</td>
+            <td><span class="status-badge-ready">✓ High-Res Ready</span></td>
+            <td>Active in navigation, hero, and app header.</td>
+          </tr>
+          <tr>
+            <td><strong>Kota Bharu Storefront</strong></td>
+            <td>Ambience & Facade</td>
+            <td>—</td>
+            <td><span class="status-badge-ready">✓ Photo Active</span></td>
+            <td>Active in storefront showcase gallery.</td>
+          </tr>
+          <tr>
+            <td><strong>Pastry Chiller Display</strong></td>
+            <td>Bakery Chiller</td>
+            <td>—</td>
+            <td><span class="status-badge-ready">✓ Photo Active</span></td>
+            <td>Active in chiller showcase & product highlights.</td>
+          </tr>
+          <tr>
+            <td><strong>Red Velvet Croissant</strong></td>
+            <td>Pastry Sogno</td>
+            <td>RM 21.00</td>
+            <td><span class="status-badge-ready">✓ In Chiller Photo</span></td>
+            <td>Individual close-up optional.</td>
+          </tr>
+          <tr>
+            <td><strong>Kunafa Pistachio</strong></td>
+            <td>Pastry Sogno</td>
+            <td>RM 18.90</td>
+            <td><span class="status-badge-ready">✓ In Chiller Photo</span></td>
+            <td>Individual close-up optional.</td>
+          </tr>
+          <tr>
+            <td><strong>Jumbo Croissant</strong></td>
+            <td>Pastry Sogno</td>
+            <td>RM 40.00</td>
+            <td><span class="status-badge-ready">✓ In Chiller Photo</span></td>
+            <td>Visible on top shelf! Individual close-up optional.</td>
+          </tr>
+          <tr>
+            <td><strong>Crofa</strong></td>
+            <td>Pastry Sogno</td>
+            <td>RM 18.90</td>
+            <td><span class="status-badge-needed">Photo Needed</span></td>
+            <td>Top-down close-up of waffle croissant with chocolate & strawberry.</td>
+          </tr>
+          <tr>
+            <td><strong>Pain Au Kitkat</strong></td>
+            <td>Pastry Sogno</td>
+            <td>RM 17.00</td>
+            <td><span class="status-badge-needed">Photo Needed</span></td>
+            <td>Close-up of flaky KitKat chocolate pastry.</td>
+          </tr>
+          <tr>
+            <td><strong>Buttercream Latte</strong></td>
+            <td>Coffee</td>
+            <td>RM 19.10</td>
+            <td><span class="status-badge-needed">Photo Needed</span></td>
+            <td>Clear glass/cup showing espresso & golden buttercream foam.</td>
+          </tr>
+          <tr>
+            <td><strong>Spanish Latte</strong></td>
+            <td>Coffee</td>
+            <td>RM 17.60</td>
+            <td><span class="status-badge-needed">Photo Needed</span></td>
+            <td>Layered cup with condensed milk & espresso.</td>
+          </tr>
+          <tr>
+            <td><strong>Sogno Americano</strong></td>
+            <td>Coffee</td>
+            <td>RM 11.00</td>
+            <td><span class="status-badge-needed">Photo Needed</span></td>
+            <td>Iced Americano with crema.</td>
+          </tr>
+          <tr>
+            <td><strong>Caramel Macchiato</strong></td>
+            <td>Coffee</td>
+            <td>RM 18.50</td>
+            <td><span class="status-badge-needed">Photo Needed</span></td>
+            <td>Caramel crosshatch on milk foam.</td>
+          </tr>
+          <tr>
+            <td><strong>Biscoff Frappe</strong></td>
+            <td>Frappe</td>
+            <td>RM 23.50</td>
+            <td><span class="status-badge-needed">Photo Needed</span></td>
+            <td>Blended drink with whipped cream & Lotus Biscoff biscuit.</td>
+          </tr>
+          <tr>
+            <td><strong>Matcha Cream Frappe</strong></td>
+            <td>Frappe</td>
+            <td>RM 22.00</td>
+            <td><span class="status-badge-needed">Photo Needed</span></td>
+            <td>Vibrant green matcha frappe with cream.</td>
+          </tr>
+          <tr>
+            <td><strong>Dark Chocolate Mocha Frappe</strong></td>
+            <td>Frappe</td>
+            <td>RM 22.50</td>
+            <td><span class="status-badge-needed">Photo Needed</span></td>
+            <td>Belgian dark cocoa blended frappe.</td>
+          </tr>
+          <tr>
+            <td><strong>Pink Lady Milk</strong></td>
+            <td>Milk Series</td>
+            <td>RM 19.10</td>
+            <td><span class="status-badge-needed">Photo Needed</span></td>
+            <td>Pastel pink milk drink with cinnamon dust.</td>
+          </tr>
+          <tr>
+            <td><strong>Strawberry Dream Milk</strong></td>
+            <td>Milk Series</td>
+            <td>RM 18.00</td>
+            <td><span class="status-badge-needed">Photo Needed</span></td>
+            <td>Layered strawberry puree and fresh milk.</td>
+          </tr>
+          <tr>
+            <td><strong>Pistachio Cream Milk</strong></td>
+            <td>Milk Series</td>
+            <td>RM 19.50</td>
+            <td><span class="status-badge-needed">Photo Needed</span></td>
+            <td>Pistachio infused iced milk drink.</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div style="margin-top:30px;background:#FBF4F5;border:1px solid var(--sogno-maroon);border-radius:var(--radius-md);padding:20px;color:var(--sogno-maroon-deep);">
+        <h4 style="font-family:var(--font-editorial);font-size:17px;font-weight:800;margin-bottom:6px;">📸 Photography Action Plan:</h4>
+        <p style="font-size:13px;line-height:1.6;">
+          Whenever you or the owner snap photos of the missing items, simply drop them into <code>assets/images/<item_id>.jpg</code>. The system is already programmed to automatically detect and display them seamlessly across both the landing page and app!
+        </p>
+      </div>
+    </div>
+  </main>
+
+  <!-- Scripts -->
+  <script src="assets/js/menu-data.js"></script>
+  <script src="assets/js/app.js"></script>
+  <script>
+    // Master View Switcher
+    const demoTabs = document.querySelectorAll('.demo-tab-btn');
+    const sections = {
+      landing: document.getElementById('viewLanding'),
+      simulator: document.getElementById('viewSimulator'),
+      pitch: document.getElementById('viewPitch')
+    };
+    const frameControls = document.getElementById('frameControls');
+    const simMockupFrame = document.getElementById('simMockupFrame');
+    const simPhoneBtn = document.getElementById('simPhoneBtn');
+    const simExpandedBtn = document.getElementById('simExpandedBtn');
+
+    function activateView(viewKey) {
+      demoTabs.forEach(t => t.classList.toggle('active', t.dataset.view === viewKey));
+      Object.keys(sections).forEach(k => {
+        sections[k].classList.toggle('active-view', k === viewKey);
+      });
+      frameControls.style.display = (viewKey === 'simulator') ? 'flex' : 'none';
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    demoTabs.forEach(t => t.addEventListener('click', () => activateView(t.dataset.view)));
+
+    // Jump from landing hero to app simulator
+    const heroBtn = document.getElementById('heroOrderAppBtn');
+    if (heroBtn) heroBtn.addEventListener('click', () => activateView('simulator'));
+    
+    const ecosystemBtn = document.getElementById('btnLaunchAppFromEcosystem');
+    if (ecosystemBtn) ecosystemBtn.addEventListener('click', () => activateView('simulator'));
+
+    // Device frame toggler
+    if (simPhoneBtn && simExpandedBtn && simMockupFrame) {
+      simPhoneBtn.addEventListener('click', () => {
+        simPhoneBtn.classList.add('active');
+        simExpandedBtn.classList.remove('active');
+        simMockupFrame.classList.remove('expanded-full');
+      });
+      simExpandedBtn.addEventListener('click', () => {
+        simExpandedBtn.classList.add('active');
+        simPhoneBtn.classList.remove('active');
+        simMockupFrame.classList.add('expanded-full');
+      });
+    }
+
+    // Populate Landing Page Menu Cards with Sensory Tasting Notes
+    function renderLandingMenuCards(category = 'all') {
+      const grid = document.getElementById('landingMenuCardsGrid');
+      if (!grid) return;
+
+      let items = SOGNO_MENU;
+      if (category !== 'all') {
+        items = items.filter(i => i.categoryId === category);
+      }
+
+      grid.innerHTML = items.map(item => `
+        <div class="menu-ticket-card">
+          <div>
+            <div class="ticket-header-line">
+              <h5>${item.name}</h5>
+              ${item.badge ? `<span class="ticket-badge-pill">${item.badge}</span>` : ''}
+            </div>
+            <p class="ticket-desc-para">${item.description}</p>
+            ${item.tastingNotes ? `
+              <div class="ticket-tasting-chips">
+                ${item.tastingNotes.map(n => `<span class="ticket-chip">${n}</span>`).join('')}
+              </div>
+            ` : ''}
+          </div>
+          <div class="ticket-bottom-bar">
+            <span class="ticket-price-display">${item.formattedPrice}</span>
+            <button class="btn-ticket-order" onclick="openAndCustomize('${item.id}')">Order in App</button>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    window.openAndCustomize = function(itemId) {
+      activateView('simulator');
+      setTimeout(() => {
+        const item = SOGNO_MENU.find(i => i.id === itemId);
+        if (item && window.openCustomizationFromExternal) {
+          window.openCustomizationFromExternal(item);
+        }
+      }, 200);
+    };
+
+    // Category Tabs in Landing Page
+    const landingNavBtns = document.querySelectorAll('#landingCatNav .menu-category-btn');
+    landingNavBtns.forEach(btn => {
+      btn.addEventListener('click', () => {
+        landingNavBtns.forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        renderLandingMenuCards(btn.dataset.cat);
+      });
+    });
+
+    renderLandingMenuCards('all');
+  </script>
+</body>
+</html>
