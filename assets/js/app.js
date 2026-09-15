@@ -1,523 +1,803 @@
-// Sogno Coffee - ZUS Benchmark Mobile Application Logic
-// Enhanced with Tasting Profiles & Frictionless Pickup/Delivery Flow
+// Sogno Coffee ordering app
 
-document.addEventListener('DOMContentLoaded', () => {
-  // State
-  let currentOutlet = SOGNO_OUTLETS[0];
-  let currentOrderType = 'pickup'; // 'pickup' or 'delivery'
-  let currentCategory = 'all';
-  let cart = [];
-  let appliedVoucher = null;
-  let activeCustomizingItem = null;
-  let customQty = 1;
-  let selectedOptions = {};
+(function () {
+  const DELIVERY_FEE = 5.00;
+  const SST_RATE = 0.06;
+  const MAX_QTY = 20;
 
-  // Elements
-  const outletModal = document.getElementById('appOutletModal');
-  const selectedStoreName = document.getElementById('appSelectedStoreName');
-  const storeTimeSub = document.getElementById('appStoreTimeSub');
-  const togglePickup = document.getElementById('appTogglePickup');
-  const toggleDelivery = document.getElementById('appToggleDelivery');
-  const searchInput = document.getElementById('appSearchInput');
-  const categoryNav = document.getElementById('appCategoryNavPills');
-  const productsContainer = document.getElementById('appProductsContainer');
-  const floatingCart = document.getElementById('appFloatingCart');
-  const cartCount = document.getElementById('appCartCount');
-  const cartTotal = document.getElementById('appCartTotal');
-  const cartTypeLabel = document.getElementById('appCartOrderTypeLabel');
-  const customModal = document.getElementById('appCustomModal');
-  const checkoutModal = document.getElementById('appCheckoutModal');
-  const trackingModal = document.getElementById('appTrackingModal');
+  const PAYMENTS = [
+    { id: 'duitnow', label: 'DuitNow QR', abbr: 'QR', color: '#E8336D' },
+    { id: 'tng', label: "Touch 'n Go eWallet", abbr: 'TNG', color: '#1E5BC6' },
+    { id: 'card', label: 'Credit / debit card', abbr: 'CARD', color: '#1D1517' },
+    { id: 'fpx', label: 'FPX online banking', abbr: 'FPX', color: '#0B7A5A' },
+    { id: 'counter', label: 'Pay at counter', abbr: 'RM', color: '#8A6A3F', pickupOnly: true }
+  ];
 
-  // Initialize
-  initOutletUI();
-  renderCategories();
-  renderProducts();
-  updateCartBar();
-
-  // 1. Outlet Switcher Logic
-  function initOutletUI() {
-    if (selectedStoreName) selectedStoreName.textContent = `${currentOutlet.name} ▾`;
-    if (storeTimeSub) {
-      storeTimeSub.textContent = currentOrderType === 'pickup'
-        ? `Ready in ${currentOutlet.pickupTime} • Self-Pickup (${currentOutlet.distance})`
-        : `Est. ${currentOutlet.deliveryTime} • Delivery to Location`;
-    }
-    if (cartTypeLabel) {
-      cartTypeLabel.textContent = currentOrderType === 'pickup' ? 'Self-Pickup' : 'Delivery';
-    }
-
-    const outletOptionsList = document.getElementById('appOutletListOptions');
-    if (outletOptionsList) {
-      outletOptionsList.innerHTML = SOGNO_OUTLETS.map(o => `
-        <div class="outlet-modal-card ${o.id === currentOutlet.id ? 'active' : ''}" data-id="${o.id}">
-          <div>
-            <div style="font-weight:800;font-size:14px;color:var(--sogno-maroon-deep);">${o.name}</div>
-            <p style="font-size:11px;color:#666;margin:2px 0;">${o.address}</p>
-            <span style="font-size:10px;font-weight:700;color:var(--sogno-gold);">${o.tag} • ${o.hours} (${o.distance})</span>
-          </div>
-          <button style="background:var(--sogno-maroon);color:#fff;border:none;padding:6px 14px;border-radius:20px;font-size:11px;font-weight:800;cursor:pointer;">Select</button>
-        </div>
-      `).join('');
-
-      outletOptionsList.querySelectorAll('.outlet-modal-card').forEach(card => {
-        card.addEventListener('click', () => {
-          const id = card.dataset.id;
-          currentOutlet = SOGNO_OUTLETS.find(o => o.id === id);
-          initOutletUI();
-          closeModal(outletModal);
-        });
-      });
-    }
-  }
-
-  const storeTrigger = document.getElementById('appStoreDropdownTrigger');
-  if (storeTrigger) storeTrigger.addEventListener('click', () => openModal(outletModal));
-
-  // 2. Pickup vs Delivery Toggle
-  if (togglePickup && toggleDelivery) {
-    togglePickup.addEventListener('click', () => {
-      currentOrderType = 'pickup';
-      togglePickup.classList.add('active');
-      toggleDelivery.classList.remove('active');
-      initOutletUI();
-      updateCheckoutReviewTotals();
-    });
-    toggleDelivery.addEventListener('click', () => {
-      currentOrderType = 'delivery';
-      toggleDelivery.classList.add('active');
-      togglePickup.classList.remove('active');
-      initOutletUI();
-      updateCheckoutReviewTotals();
-    });
-  }
-
-  // 3. Category Nav Rendering
-  function renderCategories() {
-    if (!categoryNav) return;
-    let html = `
-      <div class="app-cat-pill active" data-cat="all">
-        <span>✨ All Menu</span>
-      </div>
-    `;
-    SOGNO_CATEGORIES.forEach(cat => {
-      html += `
-        <div class="app-cat-pill" data-cat="${cat.id}">
-          <span>${cat.icon} ${cat.name}</span>
-        </div>
-      `;
-    });
-    categoryNav.innerHTML = html;
-
-    categoryNav.querySelectorAll('.app-cat-pill').forEach(pill => {
-      pill.addEventListener('click', () => {
-        categoryNav.querySelectorAll('.app-cat-pill').forEach(p => p.classList.remove('active'));
-        pill.classList.add('active');
-        currentCategory = pill.dataset.cat;
-        renderProducts();
-      });
-    });
-  }
-
-  // 4. Products Rendering (ZUS Benchmark Cards with Tasting Notes)
-  function renderProducts() {
-    if (!productsContainer) return;
-    const query = searchInput ? searchInput.value.toLowerCase().trim() : '';
-    let filtered = SOGNO_MENU;
-
-    if (currentCategory !== 'all') {
-      filtered = filtered.filter(i => i.categoryId === currentCategory);
-    }
-    if (query) {
-      filtered = filtered.filter(i => 
-        i.name.toLowerCase().includes(query) ||
-        i.description.toLowerCase().includes(query) ||
-        i.categoryName.toLowerCase().includes(query)
-      );
-    }
-
-    if (filtered.length === 0) {
-      productsContainer.innerHTML = `
-        <div style="text-align:center;padding:40px 20px;color:#999;">
-          <p style="font-size:26px;">☕</p>
-          <p style="font-size:13px;font-weight:700;margin-top:8px;">No items match "${query}"</p>
-        </div>
-      `;
-      return;
-    }
-
-    if (currentCategory === 'all' && !query) {
-      let fullHtml = '';
-      SOGNO_CATEGORIES.forEach(cat => {
-        const catItems = filtered.filter(i => i.categoryId === cat.id);
-        if (catItems.length > 0) {
-          fullHtml += `
-            <div class="app-menu-section" id="sec-${cat.id}">
-              <div class="app-section-title">
-                <h3>${cat.icon} ${cat.name}</h3>
-                <span>${cat.tag}</span>
-              </div>
-              <div class="app-items-col">
-                ${catItems.map(item => buildAppProductCard(item)).join('')}
-              </div>
-            </div>
-          `;
-        }
-      });
-      productsContainer.innerHTML = fullHtml;
-    } else {
-      productsContainer.innerHTML = `
-        <div class="app-menu-section">
-          <div class="app-items-col">
-            ${filtered.map(item => buildAppProductCard(item)).join('')}
-          </div>
-        </div>
-      `;
-    }
-
-    // Attach click to open customization modal
-    productsContainer.querySelectorAll('.app-product-card').forEach(card => {
-      card.addEventListener('click', () => {
-        const itemId = card.dataset.id;
-        const item = SOGNO_MENU.find(i => i.id === itemId);
-        if (item) openCustomizationSheet(item);
-      });
-    });
-  }
-
-  function buildAppProductCard(item) {
-    let imgBlock = '';
-    if (item.image) {
-      imgBlock = `<img src="${item.image}" alt="${item.name}" loading="lazy" />`;
-    } else {
-      const sym = item.type === 'pastry' ? '🥐' : (item.categoryId === 'frappe' ? '🥤' : (item.categoryId === 'milk-series' ? '🥛' : '☕'));
-      imgBlock = `
-        <div class="culinary-placeholder">
-          <span class="icon-sym">${sym}</span>
-          <span class="source-lbl">Sogno Kitchen</span>
-        </div>
-      `;
-    }
-
-    return `
-      <div class="app-product-card" data-id="${item.id}">
-        <div class="app-card-img-wrap">
-          ${imgBlock}
-          ${item.badge ? `<span class="app-item-badge">${item.badge}</span>` : ''}
-        </div>
-        <div class="app-card-info">
-          <div class="app-card-title-row">
-            <h4>${item.name}</h4>
-            <p class="app-card-desc">${item.description}</p>
-            ${item.tastingNotes ? `
-              <div class="app-card-tasting-notes">
-                ${item.tastingNotes.slice(0, 2).map(n => `<span class="tasting-chip">${n}</span>`).join('')}
-              </div>
-            ` : ''}
-          </div>
-          <div class="app-card-bottom">
-            <span class="app-card-price">${item.formattedPrice}</span>
-            <button class="app-card-add-circle" aria-label="Add ${item.name}">+</button>
-          </div>
-        </div>
-      </div>
-    `;
-  }
-
-  if (searchInput) {
-    searchInput.addEventListener('input', () => renderProducts());
-  }
-
-  // 5. Customization Bottom Sheet Logic
-  function openCustomizationSheet(item) {
-    activeCustomizingItem = item;
-    customQty = 1;
-    selectedOptions = {
-      temp: item.options?.temp ? item.options.temp[0] : null,
-      sweetness: item.options?.sweetness ? item.options.sweetness[0] : null,
-      milk: item.options?.milk ? item.options.milk[0] : null,
-      serving: item.options?.serving ? item.options.serving[0] : null,
-      bean: item.options?.bean ? item.options.bean[0] : null
-    };
-
-    document.getElementById('customSheetItemName').textContent = item.name;
-    document.getElementById('customSheetItemDesc').textContent = item.description;
-    document.getElementById('customSheetItemPrice').textContent = item.formattedPrice;
-    document.getElementById('customStepQty').textContent = customQty;
-
-    const body = document.getElementById('customSheetOptionsBody');
-    let optsHtml = '';
-
-    if (item.options?.temp) {
-      optsHtml += buildCustomGroup('Temperature', 'temp', item.options.temp);
-    }
-    if (item.options?.sweetness) {
-      optsHtml += buildCustomGroup('Sweetness Level', 'sweetness', item.options.sweetness);
-    }
-    if (item.options?.milk) {
-      optsHtml += buildCustomGroup('Milk Selection', 'milk', item.options.milk);
-    }
-    if (item.options?.bean) {
-      optsHtml += buildCustomGroup('Espresso Roast', 'bean', item.options.bean);
-    }
-    if (item.options?.serving) {
-      optsHtml += buildCustomGroup('Pastry Preparation', 'serving', item.options.serving);
-    }
-
-    body.innerHTML = optsHtml;
-
-    body.querySelectorAll('.custom-option-chip').forEach(chip => {
-      chip.addEventListener('click', () => {
-        const group = chip.dataset.group;
-        const val = chip.dataset.val;
-        selectedOptions[group] = val;
-        chip.parentElement.querySelectorAll('.custom-option-chip').forEach(c => c.classList.remove('active'));
-        chip.classList.add('active');
-        recalculateCustomTotal();
-      });
-    });
-
-    recalculateCustomTotal();
-    openModal(customModal);
-  }
-
-  window.openCustomizationFromExternal = function(item) {
-    openCustomizationSheet(item);
+  const state = {
+    outlet: SOGNO_OUTLETS[0],
+    mode: 'pickup',
+    query: '',
+    cart: [],
+    voucherCode: null,
+    payment: 'duitnow',
+    item: null,
+    selections: {},
+    qty: 1,
+    activeCat: SOGNO_CATEGORIES[0].id,
+    railLockUntil: 0,
+    orders: [],
+    viewingOrder: null
   };
 
-  function buildCustomGroup(title, key, choices) {
+  const $ = (id) => document.getElementById(id);
+  const menuById = Object.fromEntries(SOGNO_MENU.map((i) => [i.id, i]));
+  const money = (n) => `RM ${n.toFixed(2)}`;
+  const round2 = (n) => Math.round(n * 100) / 100;
+  const esc = (s) => String(s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+
+  const els = {
+    app: $('app'),
+    list: $('list'),
+    rail: $('rail'),
+    search: $('searchInput'),
+    searchClear: $('searchClear'),
+    cartBar: $('cartBar'),
+    orderBar: $('orderBar'),
+    ordersSheet: $('ordersSheet'),
+    toast: $('toast'),
+    itemSheet: $('itemSheet'),
+    outletSheet: $('outletSheet'),
+    cartSheet: $('cartSheet'),
+    orderSheet: $('orderSheet')
+  };
+
+  /* ---------- Sheets ---------- */
+  let sheetZ = 40;
+  const sheetStack = [];
+
+  function openSheet(sheet) {
+    if (!sheet.hidden) return;
+    sheet.style.zIndex = ++sheetZ;
+    sheet.hidden = false;
+    sheetStack.push({ sheet, focus: document.activeElement });
+    const focusTarget = sheet.querySelector('[data-close], button, input');
+    if (focusTarget) focusTarget.focus({ preventScroll: true });
+  }
+
+  function closeSheet(sheet) {
+    if (sheet.hidden) return;
+    sheet.hidden = true;
+    const idx = sheetStack.findIndex((s) => s.sheet === sheet);
+    if (idx > -1) {
+      const [entry] = sheetStack.splice(idx, 1);
+      if (entry.focus && document.contains(entry.focus)) entry.focus.focus({ preventScroll: true });
+    }
+    if (sheet === els.orderSheet) state.viewingOrder = null;
+  }
+
+  document.querySelectorAll('.sheet').forEach((sheet) => {
+    sheet.addEventListener('click', (e) => {
+      if (e.target === sheet && sheet !== els.orderSheet) closeSheet(sheet);
+      if (e.target.closest('[data-close]')) closeSheet(sheet);
+    });
+  });
+
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && sheetStack.length) closeSheet(sheetStack[sheetStack.length - 1].sheet);
+  });
+
+  /* ---------- Toast ---------- */
+  let toastTimer;
+  function toast(msg) {
+    els.toast.textContent = msg;
+    els.toast.classList.add('show');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => els.toast.classList.remove('show'), 1800);
+  }
+
+  /* ---------- Header ---------- */
+  function renderHeader() {
+    const o = state.outlet;
+    $('outletKicker').textContent = state.mode === 'pickup' ? 'Pickup from' : 'Delivering from';
+    $('outletName').textContent = o.name;
+    $('outletMeta').textContent = state.mode === 'pickup'
+      ? `Ready in ${o.pickupTime}`
+      : `Delivery in ${o.deliveryTime}`;
+
+    document.querySelectorAll('.mode-btn').forEach((b) => {
+      const on = b.dataset.mode === state.mode;
+      b.classList.toggle('is-active', on);
+      b.setAttribute('aria-pressed', on);
+    });
+  }
+
+  document.querySelectorAll('.mode-btn').forEach((b) => {
+    b.addEventListener('click', () => {
+      if (state.mode === b.dataset.mode) return;
+      state.mode = b.dataset.mode;
+      if (state.mode === 'delivery' && state.payment === 'counter') state.payment = 'duitnow';
+      renderHeader();
+      if (!els.cartSheet.hidden) renderCart();
+    });
+  });
+
+  $('outletBtn').addEventListener('click', () => {
+    renderOutlets();
+    openSheet(els.outletSheet);
+  });
+
+  /* ---------- Loyalty ---------- */
+  function renderClub() {
+    const { stamps, goal, reward } = SOGNO_CLUB;
+    $('clubText').textContent = `${goal - stamps} more for a free ${reward}`;
+    $('clubCount').innerHTML = `${stamps}<small>/${goal}</small>`;
+    $('clubCount').setAttribute('aria-label', `${stamps} of ${goal} stamps`);
+    $('clubBar').style.width = `${(stamps / goal) * 100}%`;
+  }
+
+  /* ---------- Menu ---------- */
+  function matches(item) {
+    if (!state.query) return true;
+    const q = state.query.toLowerCase();
+    return item.name.toLowerCase().includes(q) || item.description.toLowerCase().includes(q);
+  }
+
+  function qtyInCart(itemId) {
+    return state.cart.filter((l) => l.itemId === itemId).reduce((s, l) => s + l.qty, 0);
+  }
+
+  function renderRail() {
+    els.rail.innerHTML = SOGNO_CATEGORIES.map((c) => {
+      const hasMatch = SOGNO_MENU.some((i) => i.categoryId === c.id && matches(i));
+      return `
+        <button type="button" class="rail-btn ${c.id === state.activeCat ? 'is-active' : ''} ${hasMatch ? '' : 'is-empty'}" data-cat="${c.id}" ${hasMatch ? '' : 'disabled'}>${esc(c.name)}</button>`;
+    }).join('');
+  }
+
+  function productHtml(item) {
+    const qty = qtyInCart(item.id);
     return `
-      <div class="custom-group-block">
-        <h5>${title}</h5>
-        <div class="custom-pills-row">
-          ${choices.map((ch, idx) => `
-            <button type="button" class="custom-option-chip ${idx === 0 ? 'active' : ''}" data-group="${key}" data-val="${ch}">
-              ${ch}
-            </button>
-          `).join('')}
-        </div>
-      </div>
-    `;
+      <button type="button" class="product" data-id="${item.id}">
+        <img class="product-img" src="${item.image}" alt="" loading="lazy">
+        <span class="product-body">
+          ${item.badge ? `<span class="product-badge">${esc(item.badge)}</span>` : ''}
+          <span class="product-name">${esc(item.name)}</span>
+          <span class="product-desc">${esc(item.description)}</span>
+          <span class="product-foot">
+            <span class="product-price">${money(item.price)}</span>
+            <span class="add-btn" aria-hidden="true">
+              <svg class="ic ic-sm"><use href="#i-plus"/></svg>
+              ${qty ? `<span class="qty-dot">${qty}</span>` : ''}
+            </span>
+          </span>
+        </span>
+      </button>`;
   }
 
-  function recalculateCustomTotal() {
-    if (!activeCustomizingItem) return;
-    let extra = 0;
-    if (selectedOptions.milk && selectedOptions.milk.includes('+RM 3.00')) extra += 3.00;
-    if (selectedOptions.milk && selectedOptions.milk.includes('+RM 2.00')) extra += 2.00;
-    if (selectedOptions.bean && selectedOptions.bean.includes('+RM 2.50')) extra += 2.50;
+  function renderList() {
+    const sections = SOGNO_CATEGORIES.map((c) => {
+      const items = SOGNO_MENU.filter((i) => i.categoryId === c.id && matches(i));
+      if (!items.length) return '';
+      return `
+        <section class="list-section" id="sec-${c.id}" data-cat="${c.id}">
+          <h2>${esc(c.name)}</h2>
+          ${items.map(productHtml).join('')}
+        </section>`;
+    }).join('');
 
-    const unit = activeCustomizingItem.price + extra;
-    const finalTotal = unit * customQty;
-    document.getElementById('customFooterPrice').textContent = `• RM ${finalTotal.toFixed(2)}`;
+    els.list.innerHTML = sections || `
+      <div class="empty">
+        <strong>No results for "${esc(state.query)}"</strong>
+        Try another name, like latte or croissant.
+      </div>`;
+
+    if (sections) {
+      const spacer = document.createElement('div');
+      spacer.className = 'list-spacer';
+      els.list.appendChild(spacer);
+      sizeSpacer();
+    }
   }
 
-  const minusBtn = document.getElementById('customStepMinus');
-  const plusBtn = document.getElementById('customStepPlus');
-  if (minusBtn && plusBtn) {
-    minusBtn.addEventListener('click', () => {
-      if (customQty > 1) {
-        customQty--;
-        document.getElementById('customStepQty').textContent = customQty;
-        recalculateCustomTotal();
-      }
+  // Lets the last category scroll all the way to the top of the list.
+  function sizeSpacer() {
+    const spacer = els.list.querySelector('.list-spacer');
+    const sections = els.list.querySelectorAll('.list-section');
+    if (!spacer || !sections.length) return;
+    const last = sections[sections.length - 1];
+    spacer.style.height = `${Math.max(0, els.list.clientHeight - last.offsetHeight - 16)}px`;
+  }
+
+  function setActiveCat(catId) {
+    if (state.activeCat === catId) return;
+    state.activeCat = catId;
+    els.rail.querySelectorAll('.rail-btn').forEach((b) => b.classList.toggle('is-active', b.dataset.cat === catId));
+    const btn = els.rail.querySelector(`[data-cat="${catId}"]`);
+    if (btn) els.rail.scrollTo({ left: btn.offsetLeft - (els.rail.clientWidth - btn.offsetWidth) / 2, behavior: 'smooth' });
+  }
+
+  els.rail.addEventListener('click', (e) => {
+    const btn = e.target.closest('.rail-btn');
+    if (!btn || btn.disabled) return;
+    const sec = $(`sec-${btn.dataset.cat}`);
+    if (!sec) return;
+    state.railLockUntil = Date.now() + 700;
+    setActiveCat(btn.dataset.cat);
+    els.list.scrollTo({ top: sec.offsetTop });
+  });
+
+  els.list.addEventListener('scroll', () => {
+    if (Date.now() < state.railLockUntil) return;
+    const top = els.list.scrollTop + 24;
+    let current = null;
+    els.list.querySelectorAll('.list-section').forEach((sec) => {
+      if (sec.offsetTop <= top) current = sec.dataset.cat;
     });
-    plusBtn.addEventListener('click', () => {
-      customQty++;
-      document.getElementById('customStepQty').textContent = customQty;
-      recalculateCustomTotal();
-    });
+    if (!current) {
+      const first = els.list.querySelector('.list-section');
+      current = first && first.dataset.cat;
+    }
+    if (current) setActiveCat(current);
+  }, { passive: true });
+
+  els.list.addEventListener('click', (e) => {
+    const card = e.target.closest('.product');
+    if (card) openItem(menuById[card.dataset.id]);
+  });
+
+  els.search.addEventListener('input', () => {
+    state.query = els.search.value.trim();
+    els.searchClear.hidden = !els.search.value;
+    renderRail();
+    renderList();
+    els.list.scrollTop = 0;
+    const first = els.list.querySelector('.list-section');
+    if (first) { state.activeCat = null; setActiveCat(first.dataset.cat); }
+  });
+
+  els.searchClear.addEventListener('click', () => {
+    els.search.value = '';
+    els.search.dispatchEvent(new Event('input'));
+    els.search.focus();
+  });
+
+  window.addEventListener('resize', sizeSpacer);
+
+  /* ---------- Item sheet ---------- */
+  function itemGroups(item) {
+    return SOGNO_OPTION_GROUPS.filter((g) => item.options && item.options[g.key]);
   }
 
-  const confirmAddBtn = document.getElementById('btnConfirmAddToBag');
-  if (confirmAddBtn) {
-    confirmAddBtn.addEventListener('click', () => {
-      if (!activeCustomizingItem) return;
-
-      let extra = 0;
-      if (selectedOptions.milk && selectedOptions.milk.includes('+RM 3.00')) extra += 3.00;
-      if (selectedOptions.milk && selectedOptions.milk.includes('+RM 2.00')) extra += 2.00;
-      if (selectedOptions.bean && selectedOptions.bean.includes('+RM 2.50')) extra += 2.50;
-
-      const unitPrice = activeCustomizingItem.price + extra;
-      const notes = Object.values(selectedOptions).filter(Boolean).join(', ');
-
-      cart.push({
-        id: Date.now().toString(),
-        name: activeCustomizingItem.name,
-        unitPrice: unitPrice,
-        qty: customQty,
-        notes: notes,
-        total: unitPrice * customQty
-      });
-
-      updateCartBar();
-      closeModal(customModal);
-    });
+  function unitPrice(item, selections) {
+    return round2(itemGroups(item).reduce((sum, g) => {
+      const choice = item.options[g.key].find((c) => c.label === selections[g.key]);
+      return sum + (choice && choice.price ? choice.price : 0);
+    }, item.price));
   }
 
-  // 6. Floating Cart Bar
-  function updateCartBar() {
-    const totalQty = cart.reduce((sum, i) => sum + i.qty, 0);
-    const subtotal = cart.reduce((sum, i) => sum + i.total, 0);
+  function openItem(item) {
+    if (!item) return;
+    state.item = item;
+    state.qty = 1;
+    state.selections = {};
+    itemGroups(item).forEach((g) => { state.selections[g.key] = item.options[g.key][0].label; });
 
-    if (totalQty > 0) {
-      floatingCart.style.display = 'flex';
-      cartCount.textContent = totalQty;
-      cartTotal.textContent = `RM ${subtotal.toFixed(2)}`;
-      cartTypeLabel.textContent = currentOrderType === 'pickup' ? 'Self-Pickup' : 'Delivery';
+    $('itemImage').src = item.image;
+    $('itemImage').alt = item.name;
+    $('itemName').textContent = item.name;
+    $('itemPrice').textContent = money(item.price);
+    $('itemDesc').textContent = item.description;
+
+    $('itemOptions').innerHTML = itemGroups(item).map((g) => `
+      <div class="opt-group" role="radiogroup" aria-label="${esc(g.label)}">
+        <div class="opt-title"><h3>${esc(g.label)}</h3><span class="opt-req">Required</span></div>
+        ${item.options[g.key].map((c) => `
+          <button type="button" class="radio-row" role="radio" data-group="${g.key}" data-label="${esc(c.label)}" aria-checked="${state.selections[g.key] === c.label}">
+            <span class="radio"></span>
+            <span class="radio-label">${esc(c.label)}</span>
+            ${c.price ? `<span class="radio-extra">+ ${money(c.price)}</span>` : ''}
+          </button>`).join('')}
+      </div>`).join('');
+
+    els.itemSheet.querySelector('.sheet-scroll').scrollTop = 0;
+    renderItemFooter();
+    openSheet(els.itemSheet);
+  }
+
+  $('itemOptions').addEventListener('click', (e) => {
+    const row = e.target.closest('.radio-row');
+    if (!row) return;
+    state.selections[row.dataset.group] = row.dataset.label;
+    row.parentElement.querySelectorAll('.radio-row').forEach((r) => r.setAttribute('aria-checked', r === row));
+    renderItemFooter();
+  });
+
+  function renderItemFooter() {
+    $('qtyValue').textContent = state.qty;
+    $('qtyMinus').disabled = state.qty <= 1;
+    $('qtyPlus').disabled = state.qty >= MAX_QTY;
+    $('addToCartPrice').textContent = money(unitPrice(state.item, state.selections) * state.qty);
+  }
+
+  $('qtyMinus').addEventListener('click', () => { state.qty = Math.max(1, state.qty - 1); renderItemFooter(); });
+  $('qtyPlus').addEventListener('click', () => { state.qty = Math.min(MAX_QTY, state.qty + 1); renderItemFooter(); });
+
+  $('addToCart').addEventListener('click', () => {
+    const item = state.item;
+    const selections = { ...state.selections };
+    const key = `${item.id}|${itemGroups(item).map((g) => selections[g.key]).join('|')}`;
+    const existing = state.cart.find((l) => l.key === key);
+    if (existing) {
+      existing.qty = Math.min(MAX_QTY, existing.qty + state.qty);
     } else {
-      floatingCart.style.display = 'none';
+      state.cart.push({ key, itemId: item.id, selections, unitPrice: unitPrice(item, selections), qty: state.qty });
+    }
+    closeSheet(els.itemSheet);
+    cartChanged(true);
+    toast(`Added ${state.qty} × ${item.name}`);
+  });
+
+  /* ---------- Cart ---------- */
+  function cartCount() { return state.cart.reduce((s, l) => s + l.qty, 0); }
+  function subtotal() { return round2(state.cart.reduce((s, l) => s + l.unitPrice * l.qty, 0)); }
+
+  function selectionText(line) {
+    const item = menuById[line.itemId];
+    return itemGroups(item).map((g) => line.selections[g.key]).join(', ');
+  }
+
+  function cartChanged(bump) {
+    const count = cartCount();
+    els.cartBar.hidden = count === 0;
+    els.app.classList.toggle('has-cart', count > 0);
+    $('cartBarCount').textContent = count;
+    $('cartBarTotal').textContent = money(subtotal());
+    if (bump && count) {
+      els.cartBar.classList.remove('bump');
+      void els.cartBar.offsetWidth;
+      els.cartBar.classList.add('bump');
+    }
+    const scroll = els.list.scrollTop;
+    renderList();
+    els.list.scrollTop = scroll;
+    if (!els.cartSheet.hidden) {
+      if (count === 0) closeSheet(els.cartSheet);
+      else renderCart();
     }
   }
 
-  if (floatingCart) {
-    floatingCart.addEventListener('click', () => {
-      renderCheckoutItems();
-      updateCheckoutReviewTotals();
-      openModal(checkoutModal);
-    });
+  els.cartBar.addEventListener('click', () => {
+    renderCart();
+    els.cartSheet.querySelector('.sheet-scroll').scrollTop = 0;
+    openSheet(els.cartSheet);
+  });
+
+  function voucherStatus(v, sub) {
+    if (v.type === 'delivery' && state.mode !== 'delivery') {
+      return { ok: false, reason: 'Delivery only', message: `${v.code} only works on delivery orders.` };
+    }
+    if (sub < v.minSpend) {
+      return { ok: false, reason: `Spend ${money(v.minSpend - sub)} more`, message: `Spend ${money(v.minSpend - sub)} more to use ${v.code}.` };
+    }
+    return { ok: true };
   }
 
-  // 7. Checkout Review Bag
-  function renderCheckoutItems() {
-    const list = document.getElementById('checkoutItemsContainer');
-    if (!list) return;
+  function totals() {
+    const sub = subtotal();
+    const deliveryFee = state.mode === 'delivery' ? DELIVERY_FEE : 0;
+    const v = SOGNO_VOUCHERS.find((x) => x.code === state.voucherCode);
+    let itemDiscount = 0;
+    let deliveryDiscount = 0;
+    if (v && voucherStatus(v, sub).ok) {
+      if (v.type === 'percent') itemDiscount = round2(sub * v.value);
+      if (v.type === 'delivery') deliveryDiscount = Math.min(v.value, deliveryFee);
+    }
+    const taxable = sub - itemDiscount;
+    const tax = round2(taxable * SST_RATE);
+    const total = round2(taxable + tax + deliveryFee - deliveryDiscount);
+    return { sub, deliveryFee, itemDiscount, deliveryDiscount, tax, total, voucher: v };
+  }
 
-    if (cart.length === 0) {
-      list.innerHTML = `<p style="text-align:center;color:#888;padding:24px;">Your bag is currently empty.</p>`;
-      return;
+  // A voucher message survives the render that follows it, then clears on the next change.
+  let voucherMsgRenders = 0;
+  function setVoucherMsg(text, kind) {
+    const el = $('voucherMsg');
+    el.hidden = !text;
+    el.textContent = text || '';
+    el.className = `voucher-msg ${kind || ''}`;
+    voucherMsgRenders = 0;
+  }
+
+  function applyVoucher(code) {
+    const v = SOGNO_VOUCHERS.find((x) => x.code === code);
+    if (!v) { setVoucherMsg(code ? `"${code}" is not a valid code.` : 'Enter a voucher code.', 'err'); return; }
+    const status = voucherStatus(v, subtotal());
+    if (!status.ok) { setVoucherMsg(status.message, 'err'); return; }
+    state.voucherCode = v.code;
+    $('voucherInput').value = '';
+    setVoucherMsg(`${v.code} applied. ${v.label}.`, 'ok');
+    renderCart();
+  }
+
+  $('voucherForm').addEventListener('submit', (e) => {
+    e.preventDefault();
+    applyVoucher($('voucherInput').value.trim().toUpperCase());
+  });
+
+  $('voucherList').addEventListener('click', (e) => {
+    const btn = e.target.closest('.voucher');
+    if (!btn) return;
+    if (btn.dataset.code === state.voucherCode) {
+      state.voucherCode = null;
+      setVoucherMsg('', '');
+      renderCart();
+    } else {
+      applyVoucher(btn.dataset.code);
+    }
+  });
+
+  $('paymentList').addEventListener('click', (e) => {
+    const row = e.target.closest('.radio-row');
+    if (!row) return;
+    state.payment = row.dataset.id;
+    renderCart();
+  });
+
+  $('cartLines').addEventListener('click', (e) => {
+    const btn = e.target.closest('[data-step]');
+    if (!btn) return;
+    const line = state.cart.find((l) => l.key === btn.dataset.key);
+    if (!line) return;
+    line.qty += Number(btn.dataset.step);
+    if (line.qty <= 0) state.cart = state.cart.filter((l) => l !== line);
+    line.qty = Math.min(MAX_QTY, line.qty);
+    cartChanged(false);
+  });
+
+  $('fulfilCard').addEventListener('click', () => {
+    renderOutlets();
+    openSheet(els.outletSheet);
+  });
+
+  function renderCart() {
+    const o = state.outlet;
+    const pickup = state.mode === 'pickup';
+    $('fulfilIconUse').setAttribute('href', pickup ? '#i-store' : '#i-bike');
+    $('fulfilTitle').textContent = pickup ? `Pickup at ${o.name}` : `Delivery from ${o.name}`;
+    $('fulfilMeta').textContent = pickup ? `Ready in ${o.pickupTime}` : `Arrives in ${o.deliveryTime}`;
+
+    $('cartLines').innerHTML = state.cart.map((l) => {
+      const item = menuById[l.itemId];
+      return `
+        <div class="line">
+          <img class="line-img" src="${item.image}" alt="">
+          <div class="line-body">
+            <div class="line-name">${esc(item.name)}</div>
+            <div class="line-opts">${esc(selectionText(l))}</div>
+            <div class="line-foot">
+              <span class="line-price">${money(l.unitPrice * l.qty)}</span>
+              <div class="stepper stepper-sm">
+                <button type="button" data-step="-1" data-key="${esc(l.key)}" aria-label="${l.qty === 1 ? 'Remove' : 'Decrease'} ${esc(item.name)}"><svg class="ic ic-sm"><use href="#i-minus"/></svg></button>
+                <span>${l.qty}</span>
+                <button type="button" data-step="1" data-key="${esc(l.key)}" aria-label="Increase ${esc(item.name)}" ${l.qty >= MAX_QTY ? 'disabled' : ''}><svg class="ic ic-sm"><use href="#i-plus"/></svg></button>
+              </div>
+            </div>
+          </div>
+        </div>`;
+    }).join('');
+
+    if (++voucherMsgRenders > 1) setVoucherMsg('', '');
+
+    // Drop a voucher that no longer qualifies (cart shrank or order type changed).
+    const sub = subtotal();
+    const applied = SOGNO_VOUCHERS.find((v) => v.code === state.voucherCode);
+    if (applied && !voucherStatus(applied, sub).ok) {
+      state.voucherCode = null;
+      setVoucherMsg(`${applied.code} removed. ${voucherStatus(applied, sub).message}`, 'err');
+      voucherMsgRenders = 1;
     }
 
-    list.innerHTML = cart.map(item => `
-      <div style="display:flex;justify-content:space-between;align-items:center;padding:12px 0;border-bottom:1px solid #EFEFEF;">
-        <div>
-          <h5 style="font-size:14px;font-weight:800;color:var(--sogno-maroon-deep);">${item.qty}x ${item.name}</h5>
-          <p style="font-size:11px;color:#777;margin-top:2px;">${item.notes || 'Standard Preparation'}</p>
-        </div>
-        <div style="display:flex;align-items:center;gap:12px;">
-          <span style="font-family:var(--font-mono);font-size:14px;font-weight:800;color:var(--sogno-maroon);">RM ${item.total.toFixed(2)}</span>
-          <button class="remove-cart-item-btn" data-id="${item.id}" style="background:transparent;border:none;color:#DC2626;font-size:16px;cursor:pointer;">✕</button>
-        </div>
-      </div>
-    `).join('');
+    $('voucherList').innerHTML = SOGNO_VOUCHERS.map((v) => {
+      const status = voucherStatus(v, sub);
+      const isApplied = v.code === state.voucherCode;
+      const stateText = isApplied ? 'Remove' : status.ok ? 'Apply' : status.reason;
+      return `
+        <button type="button" class="voucher ${isApplied ? 'is-applied' : ''} ${!isApplied && !status.ok ? 'is-locked' : ''}" data-code="${v.code}">
+          <svg class="ic"><use href="${isApplied ? '#i-check' : '#i-tag'}"/></svg>
+          <span class="voucher-body">
+            <span class="voucher-code">${v.code}</span>
+            <span class="voucher-desc">${esc(v.label)} · min. spend ${money(v.minSpend)}</span>
+          </span>
+          <span class="voucher-state">${stateText}</span>
+        </button>`;
+    }).join('');
 
-    list.querySelectorAll('.remove-cart-item-btn').forEach(btn => {
-      btn.addEventListener('click', (e) => {
-        e.stopPropagation();
-        const id = btn.dataset.id;
-        cart = cart.filter(i => i.id !== id);
-        updateCartBar();
-        renderCheckoutItems();
-        updateCheckoutReviewTotals();
-        if (cart.length === 0) closeModal(checkoutModal);
-      });
-    });
+    $('paymentList').innerHTML = PAYMENTS.filter((p) => pickup || !p.pickupOnly).map((p) => `
+      <button type="button" class="radio-row" role="radio" data-id="${p.id}" aria-checked="${state.payment === p.id}">
+        <span class="radio"></span>
+        <span class="pay-icon" style="background:${p.color}">${p.abbr}</span>
+        <span class="radio-label">${esc(p.label)}</span>
+      </button>`).join('');
+
+    const t = totals();
+    $('sumSubtotal').textContent = money(t.sub);
+    $('sumDiscountRow').hidden = !(t.itemDiscount || t.deliveryDiscount);
+    $('sumDiscountLabel').textContent = t.voucher ? `Voucher (${t.voucher.code})` : 'Voucher';
+    $('sumDiscount').textContent = `- ${money(t.itemDiscount + t.deliveryDiscount)}`;
+    $('sumDeliveryRow').hidden = !t.deliveryFee;
+    $('sumDelivery').textContent = money(t.deliveryFee);
+    $('sumTax').textContent = money(t.tax);
+    $('sumTotal').textContent = money(t.total);
+    $('placeOrder').disabled = state.cart.length === 0;
+    $('placeOrder').textContent = state.payment === 'counter' ? 'Place order' : `Pay ${money(t.total)}`;
   }
 
-  function updateCheckoutReviewTotals() {
-    const subtotal = cart.reduce((sum, i) => sum + i.total, 0);
-    const tax = subtotal * 0.06;
-    const delivery = (currentOrderType === 'delivery' && subtotal > 0) ? 5.00 : 0.00;
+  /* ---------- Outlets ---------- */
+  function renderOutlets() {
+    $('outletList').innerHTML = SOGNO_OUTLETS.map((o) => `
+      <button type="button" class="outlet-row radio-row" role="radio" data-id="${o.id}" aria-checked="${o.id === state.outlet.id}">
+        <span class="radio"></span>
+        <span class="radio-label">
+          <span class="outlet-row-name">${esc(o.name)}</span>
+          <span class="outlet-row-addr">${esc(o.address)}</span>
+          <span class="outlet-row-meta">${esc(o.region)} · Pickup in ${esc(o.pickupTime)}</span>
+        </span>
+      </button>`).join('');
+  }
 
-    let discount = 0;
-    if (appliedVoucher) {
-      discount = appliedVoucher.type === 'flat' ? appliedVoucher.discount : subtotal * appliedVoucher.discount;
+  $('outletList').addEventListener('click', (e) => {
+    const row = e.target.closest('.outlet-row');
+    if (!row) return;
+    state.outlet = SOGNO_OUTLETS.find((o) => o.id === row.dataset.id);
+    renderHeader();
+    if (!els.cartSheet.hidden) renderCart();
+    closeSheet(els.outletSheet);
+    toast(`Ordering from ${state.outlet.name}`);
+  });
+
+  /* ---------- Orders ---------- */
+  // Demo timeline: how long after placing an order each step is reached.
+  const STEP_AFTER_MS = [0, 5000, 10000];
+  const ORDERS_KEY = 'sogno.orders';
+
+  function loadOrders() {
+    try {
+      const saved = JSON.parse(localStorage.getItem(ORDERS_KEY) || '[]');
+      return Array.isArray(saved) ? saved.filter((o) => o && o.no && Array.isArray(o.lines) && o.lines.every((l) => menuById[l.itemId])) : [];
+    } catch (e) {
+      return [];
     }
-
-    const grandTotal = Math.max(0, subtotal + tax + delivery - discount);
-
-    const subEl = document.getElementById('coSubtotalVal');
-    const taxEl = document.getElementById('coTaxVal');
-    const delEl = document.getElementById('coDeliveryVal');
-    const discEl = document.getElementById('coDiscountVal');
-    const totEl = document.getElementById('coFinalTotalVal');
-
-    if (subEl) subEl.textContent = `RM ${subtotal.toFixed(2)}`;
-    if (taxEl) taxEl.textContent = `RM ${tax.toFixed(2)}`;
-    if (delEl) delEl.textContent = delivery > 0 ? `RM ${delivery.toFixed(2)}` : 'FREE';
-    if (discEl) discEl.textContent = discount > 0 ? `- RM ${discount.toFixed(2)}` : 'RM 0.00';
-    if (totEl) totEl.textContent = `RM ${grandTotal.toFixed(2)}`;
   }
 
-  // Voucher Application
-  const applyVoucherBtn = document.getElementById('appApplyVoucherBtn');
-  const voucherInput = document.getElementById('appVoucherInput');
-  const voucherFeedback = document.getElementById('appVoucherFeedback');
-
-  if (applyVoucherBtn && voucherInput) {
-    applyVoucherBtn.addEventListener('click', () => {
-      const code = voucherInput.value.toUpperCase().trim();
-      const match = SOGNO_VOUCHERS.find(v => v.code === code);
-      if (match) {
-        appliedVoucher = match;
-        voucherFeedback.style.display = 'block';
-        voucherFeedback.style.color = '#166534';
-        voucherFeedback.textContent = `✓ Active: ${match.label}`;
-        updateCheckoutReviewTotals();
-      } else {
-        voucherFeedback.style.display = 'block';
-        voucherFeedback.style.color = '#DC2626';
-        voucherFeedback.textContent = `Invalid code. Try "SOGNO20" for 20% off!`;
-      }
-    });
+  function saveOrders() {
+    state.orders = state.orders.filter((o, i) => !o.completed || i < 10);
+    try { localStorage.setItem(ORDERS_KEY, JSON.stringify(state.orders)); } catch (e) { /* storage unavailable */ }
   }
 
-  // Final Order Placement
-  const placeOrderFinal = document.getElementById('btnPlaceOrderFinal');
-  if (placeOrderFinal) {
-    placeOrderFinal.addEventListener('click', () => {
-      if (cart.length === 0) return;
+  state.orders = loadOrders();
 
-      const rnd = Math.floor(1000 + Math.random() * 9000);
-      const code = `SG-${rnd}`;
-      const codeEl = document.getElementById('appTrackingCode');
-      const outletLabel = document.getElementById('appTrackingOutletLabel');
+  const outletById = (id) => SOGNO_OUTLETS.find((o) => o.id === id) || SOGNO_OUTLETS[0];
+  const paymentById = (id) => PAYMENTS.find((p) => p.id === id) || PAYMENTS[0];
+  const timeText = (ms) => new Date(ms).toLocaleTimeString('en-MY', { hour: 'numeric', minute: '2-digit' });
 
-      if (codeEl) codeEl.textContent = `Order #${code}`;
-      if (outletLabel) outletLabel.textContent = `${currentOutlet.name} (${currentOrderType === 'pickup' ? 'Self-Pickup' : 'Delivery'})`;
+  function orderStep(order) {
+    const elapsed = Date.now() - order.placedAt;
+    return STEP_AFTER_MS.reduce((step, after, i) => (elapsed >= after ? i : step), 0);
+  }
 
-      closeModal(checkoutModal);
-      cart = [];
-      appliedVoucher = null;
-      updateCartBar();
-      openModal(trackingModal);
+  function stepLabels(order) {
+    return order.mode === 'pickup'
+      ? ['Received', 'Preparing', 'Ready for pickup']
+      : ['Received', 'Preparing', 'On the way'];
+  }
 
-      setTimeout(() => {
-        const step2 = document.getElementById('stepBakerActive');
-        if (step2) {
-          step2.classList.add('active');
-          const circle = step2.querySelector('.step-circle');
-          if (circle) {
-            circle.style.background = 'var(--sogno-maroon)';
-            circle.style.color = '#fff';
-          }
-          const span = step2.querySelector('span');
-          if (span) span.style.color = 'var(--sogno-maroon)';
+  function orderStatusText(order) {
+    const step = orderStep(order);
+    if (step === 0) return 'Order received';
+    if (step === 1) return 'Preparing your order';
+    return order.mode === 'pickup' ? 'Ready for pickup' : 'Your order is on the way';
+  }
+
+  const activeOrders = () => state.orders.filter((o) => !o.completed);
+
+  function renderOrderBar() {
+    const active = activeOrders();
+    els.orderBar.hidden = active.length === 0;
+    els.app.classList.toggle('has-order', active.length > 0);
+    if (!active.length) return;
+    const latest = active[0];
+    const outlet = outletById(latest.outletId);
+    const ready = orderStep(latest) === 2;
+    els.orderBar.classList.toggle('is-ready', ready);
+    $('orderBarTitle').textContent = active.length > 1 ? `${active.length} current orders` : orderStatusText(latest);
+    $('orderBarMeta').textContent = active.length > 1
+      ? `Latest: #${latest.no} · ${orderStatusText(latest)}`
+      : `#${latest.no} · ${latest.mode === 'pickup' ? 'Pickup at' : 'Delivery from'} ${outlet.name}`;
+  }
+
+  els.orderBar.addEventListener('click', () => {
+    const active = activeOrders();
+    if (active.length === 1) {
+      showOrder(active[0]);
+    } else if (active.length > 1) {
+      renderOrdersList();
+      openSheet(els.ordersSheet);
+    }
+  });
+
+  function renderOrdersList() {
+    $('ordersList').innerHTML = activeOrders().map((o) => `
+      <button type="button" class="orders-row" data-no="${esc(o.no)}">
+        <span class="orders-row-body">
+          <strong>#${esc(o.no)} · ${esc(orderStatusText(o))}</strong>
+          <span>${o.mode === 'pickup' ? 'Pickup at' : 'Delivery from'} ${esc(outletById(o.outletId).name)} · ${timeText(o.placedAt)} · ${money(o.total)}</span>
+        </span>
+        <svg class="ic"><use href="#i-chevron-right"/></svg>
+      </button>`).join('');
+  }
+
+  $('ordersList').addEventListener('click', (e) => {
+    const row = e.target.closest('.orders-row');
+    if (!row) return;
+    const order = state.orders.find((o) => o.no === row.dataset.no);
+    closeSheet(els.ordersSheet);
+    if (order) showOrder(order);
+  });
+
+  // Keeps the order bar and an open status screen in sync with the timeline.
+  setInterval(() => {
+    if (!activeOrders().length) return;
+    renderOrderBar();
+    if (!els.ordersSheet.hidden) renderOrdersList();
+    if (!els.orderSheet.hidden && state.viewingOrder) renderOrderProgress(state.viewingOrder);
+  }, 1000);
+
+  $('placeOrder').addEventListener('click', () => {
+    if (!state.cart.length) return;
+    const t = totals();
+    const order = {
+      no: `SG-${Math.floor(1000 + Math.random() * 9000)}`,
+      mode: state.mode,
+      outletId: state.outlet.id,
+      lines: state.cart.map((l) => ({ ...l })),
+      total: t.total,
+      paymentId: state.payment,
+      placedAt: Date.now(),
+      completed: false
+    };
+    state.orders.unshift(order);
+    saveOrders();
+
+    state.cart = [];
+    state.voucherCode = null;
+    setVoucherMsg('', '');
+    closeSheet(els.cartSheet);
+    cartChanged(false);
+    renderOrderBar();
+    showOrder(order);
+  });
+
+  function renderOrderProgress(order) {
+    const step = orderStep(order);
+    const labels = stepLabels(order);
+    $('orderProgress').innerHTML = labels.map((label, i) => `
+      <li class="${i < step ? 'done' : ''} ${i === step ? 'current' : ''}">${label}<span class="progress-time">${i <= step ? timeText(order.placedAt + STEP_AFTER_MS[i]) : '&nbsp;'}</span></li>`).join('');
+    const ready = step === 2;
+    $('orderCollected').hidden = !ready;
+    $('orderCollected').textContent = order.mode === 'pickup' ? 'I\'ve collected it' : 'I\'ve received it';
+  }
+
+  function showOrder(order) {
+    state.viewingOrder = order;
+    const pickup = order.mode === 'pickup';
+    const outlet = outletById(order.outletId);
+    $('orderNo').textContent = `Order #${order.no}`;
+    $('orderWhere').textContent = pickup
+      ? `Pickup at ${outlet.name} · placed ${timeText(order.placedAt)}`
+      : `Delivery from ${outlet.name} · placed ${timeText(order.placedAt)}`;
+    renderOrderProgress(order);
+
+    $('qrCard').hidden = !pickup;
+    if (pickup) $('qrBox').innerHTML = qrSvg(order.no);
+
+    $('orderLines').innerHTML = order.lines.map((l) => {
+      const item = menuById[l.itemId];
+      return `
+        <div class="line">
+          <img class="line-img" src="${item.image}" alt="">
+          <div class="line-body">
+            <div class="line-name">${l.qty} × ${esc(item.name)}</div>
+            <div class="line-opts">${esc(selectionText(l))}</div>
+          </div>
+          <div class="line-price">${money(l.unitPrice * l.qty)}</div>
+        </div>`;
+    }).join('');
+
+    const payment = paymentById(order.paymentId);
+    const payAtCounter = payment.id === 'counter';
+    $('orderTitle').textContent = payAtCounter ? 'Order placed' : 'Payment successful';
+    $('orderPaidLabel').textContent = payAtCounter ? 'To pay at counter' : `Paid with ${payment.label}`;
+    $('orderPaid').textContent = money(order.total);
+
+    els.orderSheet.querySelector('.sheet-scroll').scrollTop = 0;
+    openSheet(els.orderSheet);
+  }
+
+  $('orderDone').addEventListener('click', () => {
+    closeSheet(els.orderSheet);
+    if (activeOrders().length && !sessionFlags.orderBarHintShown) {
+      sessionFlags.orderBarHintShown = true;
+      toast('Track your order from the bar at the bottom');
+    }
+  });
+
+  $('orderCollected').addEventListener('click', () => {
+    const order = state.viewingOrder;
+    if (order) {
+      order.completed = true;
+      saveOrders();
+    }
+    closeSheet(els.orderSheet);
+    renderOrderBar();
+    toast('Enjoy! See you again soon');
+  });
+
+  const sessionFlags = {};
+
+  // Decorative pickup code (not a scannable QR), stable per order number.
+  function qrSvg(seed) {
+    const n = 25;
+    let h = 2166136261;
+    for (const ch of seed) h = Math.imul(h ^ ch.charCodeAt(0), 16777619);
+    const rand = () => {
+      h = Math.imul(h ^ (h >>> 15), 2246822507);
+      h = Math.imul(h ^ (h >>> 13), 3266489909);
+      return ((h ^= h >>> 16) >>> 0) / 4294967296;
+    };
+    const inFinder = (x, y) => [[0, 0], [n - 7, 0], [0, n - 7]].find(([fx, fy]) => x >= fx - 1 && x <= fx + 7 && y >= fy - 1 && y <= fy + 7);
+    let d = '';
+    for (let y = 0; y < n; y++) {
+      for (let x = 0; x < n; x++) {
+        let on;
+        const f = inFinder(x, y);
+        if (f) {
+          const lx = x - f[0], ly = y - f[1];
+          const inside = lx >= 0 && lx <= 6 && ly >= 0 && ly <= 6;
+          on = inside && (lx === 0 || lx === 6 || ly === 0 || ly === 6 || (lx >= 2 && lx <= 4 && ly >= 2 && ly <= 4));
+        } else if (x === 6 || y === 6) {
+          on = (x + y) % 2 === 0;
+        } else {
+          on = rand() < 0.48;
         }
-      }, 3000);
-    });
+        if (on) d += `M${x} ${y}h1v1h-1z`;
+      }
+    }
+    return `<svg viewBox="-1 -1 ${n + 2} ${n + 2}" role="img" aria-label="Pickup code"><rect x="-1" y="-1" width="${n + 2}" height="${n + 2}" fill="#fff"/><path d="${d}" fill="#1D1517"/></svg>`;
   }
 
-  // Modal Helpers
-  function openModal(el) {
-    if (el) el.classList.add('active');
+  /* ---------- Deep links (#item=<id>) and messages from the website ---------- */
+  function openFromHash() {
+    const m = location.hash.match(/^#item=([\w-]+)$/);
+    if (!m || !menuById[m[1]]) return;
+    history.replaceState(null, '', location.pathname + location.search);
+    openItem(menuById[m[1]]);
   }
 
-  function closeModal(el) {
-    if (el) el.classList.remove('active');
-  }
-
-  document.querySelectorAll('.close-sheet-btn').forEach(btn => {
-    btn.addEventListener('click', () => {
-      const parent = btn.closest('.app-sheet-backdrop');
-      if (parent) closeModal(parent);
-    });
+  window.addEventListener('hashchange', openFromHash);
+  window.addEventListener('message', (e) => {
+    if (e.source !== window.parent || !e.data || e.data.type !== 'sogno:open-item') return;
+    const item = menuById[e.data.id];
+    if (!item) return;
+    sheetStack.slice().reverse().forEach(({ sheet }) => closeSheet(sheet));
+    openItem(item);
   });
 
-  document.querySelectorAll('.app-sheet-backdrop').forEach(bg => {
-    bg.addEventListener('click', (e) => {
-      if (e.target === bg) closeModal(bg);
-    });
-  });
-});
+  /* ---------- Init ---------- */
+  renderHeader();
+  renderClub();
+  renderRail();
+  renderList();
+  cartChanged(false);
+  renderOrderBar();
+  openFromHash();
+})();
